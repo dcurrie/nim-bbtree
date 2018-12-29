@@ -7,11 +7,11 @@ BBTree is a Bounded Balance Tree library for the [Nim programming language](http
 BBTrees, also known as Weight Balanced Trees, or Adams Trees, are a persistent data structure
 with a nice combination of properties:
 
-* Generic (parameterized) key,value store
+* Generic (parameterized) key,value map
 * Insert (`add`), lookup (`get`), and delete (`del`) in O(log(N)) time
-* Key-ordered interators (`inorder` and `revorder`)
+* Key-ordered iterators (`inorder` and `revorder`)
 * Lookup by relative position from beginning or end (`getNth`) in O(log(N)) time
-* Efficient set operarations TODO
+* Efficient set operations TODO
 
 By "persistent" we mean that the BBTree always preserves the previous version of itself when it is modified. 
 As such it is effectively immutable, as the operations do not (visibly) update the structure in-place, 
@@ -21,9 +21,9 @@ The BBTree data structure resides in heap memory, and is destroyed by the garbag
 are no longer any program references to it. When insertions or deletions to the tree are made, we 
 attempt to reuse as much of the old structure as possible.
 
-Because the BBTree is never mutated all library functions that operate on it are Nim `func`s.
+Because the BBTree is never mutated all library functions that operate on it are Nim `func` -- no side effects.
 A BBTree may be shared across threads safely (though updates in one thread will not be visible 
-in another until the modified tree is shared).
+in another until the modified tree is shared once again).
 
 ## BBTree Credits
 
