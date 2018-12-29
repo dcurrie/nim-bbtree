@@ -31,6 +31,16 @@ Milan Straka <fox@ucw.cz>
 Department of Applied Mathematics Charles University in Prague, Czech Republic
 ]#
 
+## Bounded Balance Trees a.k.a. Weight Balanced Trees
+## 
+## a persistent data structure providing a generic (parameterized) key,value map
+##
+## * Insert (``add``), lookup (``get``), and delete (``del``) in O(log(N)) time
+## * Key-ordered iterators (``inorder`` and ``revorder``)
+## * Lookup by relative position from beginning or end (``getNth``) in O(log(N)) time
+## * Get the position (``rank``) by key in O(log(N)) time
+## * Efficient set operations **TODO**
+
 type
     BBTree*[K,V] = ref object   # BBTree is a generic type with keys and values of types K, V
         left:  BBTree[K,V]      # left subtree; may be nil
@@ -50,7 +60,7 @@ func nodeSize[K,V](n: BBTree[K,V]): int {.inline.} =
         result = n.size
 
 func len*[K,V](root: BBTree[K,V]): int =
-    ## returns the number of keys in tree at `root`. O(1)
+    ## Returns the number of keys in tree at `root`.  O(1)
     result = nodeSize(root)
 
 func newLeaf[K,V](key: K, value: V): BBTree[K,V] =
@@ -140,7 +150,7 @@ insert k (Node left _ key right) = case k ‘compare‘ key of
 ]#
 
 func add*[K,V](root: BBTree[K,V], key: K, value: V): BBTree[K,V] =
-    ## Returns a new tree with the (`key`,`value`) pair added, or replaced if `key` is already
+    ## Returns a new tree with the (`key`, `value`) pair added, or replaced if `key` is already
     ## in the tree `root`. O(log N)
     if root == nil:
         result = newLeaf(key, value)
@@ -163,7 +173,7 @@ func add*[K,V](root: BBTree[K,V], key: K, value: V): BBTree[K,V] =
 # default is returned is key is not in tree
 #
 func get*[K,V](root: BBTree[K,V], key: K, default: V): V =
-    ## retrieves the value for `key` in the tree `root` iff `key` is in the tree. 
+    ## Retrieves the value for `key` in the tree `root` iff `key` is in the tree. 
     ## Otherwise, `default` is returned. O(log N)
     result = default
     var node = root
@@ -178,9 +188,9 @@ func get*[K,V](root: BBTree[K,V], key: K, default: V): V =
             node = nil # break
 
 func getNth*[K,V](root: BBTree[K,V], index: int, default: (K, V)): (K, V) =
-    ## Get the key,value pair of the 0-based `index`th key in the tree `root` when index is 
-    ## positive and less than the tree length, or get the tree length plus `index`th key in 
-    ## the tree `root` when the `index` is negative and greater than the negative tree length,
+    ## Get the key,value pair of the 0-based `index` key in the tree `root` when index is 
+    ## positive and less than the tree length. Or get the tree length plus `index` key in 
+    ## the tree `root` when the `index` is negative and greater than the negative tree length.
     ## Otherwise, `default` is returned. O(log N)
     result = default
     let treesize = nodeSize(root)
@@ -204,7 +214,7 @@ func getNth*[K,V](root: BBTree[K,V], index: int, default: (K, V)): (K, V) =
     # else index is out of range; default is returned
 
 func getMin*[K,V](root: BBTree[K,V], default: (K, V)): (K, V) =
-    ## retrieves the key,value pair with the smallest key in the tree `root`
+    ## Retrieves the key,value pair with the smallest key in the tree `root`
     ## For an empty tree `default` is returned. O(log N)
     var node = root
     if node == nil:
@@ -215,7 +225,7 @@ func getMin*[K,V](root: BBTree[K,V], default: (K, V)): (K, V) =
         result = (node.key, node.val)
 
 func getMax*[K,V](root: BBTree[K,V], default: (K, V)): (K, V) =
-    ## retrieves the key,value pair with the largest key in the tree `root`
+    ## Retrieves the key,value pair with the largest key in the tree `root`
     ## For an empty tree `default` is returned. O(log N)
     var node = root
     if node == nil:
@@ -233,7 +243,7 @@ func getKV[K,V](node: BBTree[K,V], default: (K, V)): (K, V) {.inline.} =
 
 func getNext*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
     ## Returns the key,value pair with smallest key > `key`.
-    ## It is almost inorder successor, except it also works when `key` is not present.
+    ## It is almost inorder successor, but it also works when `key` is not present.
     ## If there is no such successor key in the tree, `default` is returned. O(log N)
     var last_left_from: BBTree[K,V] = nil
     var node = root
@@ -259,7 +269,7 @@ func getNext*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
 
 func getPrev*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
     ## Returns the key,value pair with largest key < `key`.
-    ## It is almost inorder predecessor, except it also works when `key` is not present.
+    ## It is almost inorder predecessor, but it also works when `key` is not present.
     ## If there is no such predecessor key in the tree, `default` is returned. O(log N)
     var last_right_from: BBTree[K,V] = nil
     var node = root
@@ -334,7 +344,7 @@ func glue[K,V](left: BBTree[K,V], right: BBTree[K,V]): BBTree[K,V] =
         result = newNode(left, mink, minv, rightp)
 
 func del*[K,V](root: BBTree[K,V], key: K): BBTree[K,V] =
-    ## deletes `key` from tree `root`. Does nothing if the key does not exist.
+    ## Deletes `key` from tree `root`. Does nothing if the key does not exist.
     ## O(log N)
     if root == nil:
         result = root
@@ -371,7 +381,7 @@ func delMax*[K,V](root: BBTree[K,V]): BBTree[K,V] =
 ]#
 
 func rank*[K,V](root: BBTree[K,V], key: K, default: int): int =
-    ## retrieves the 0-based index of `key` in the tree `root` iff `key` is in the tree. 
+    ## Retrieves the 0-based index of `key` in the tree `root` iff `key` is in the tree. 
     ## Otherwise, `default` is returned. O(log N)
     result = default
     var n = 0
@@ -405,9 +415,8 @@ iterator preorder*[K,V](root: BBTree[K,V]): (K,V) =
 ]#
 
 iterator inorder*[K,V](root: BBTree[K,V]): (K,V) =
-  # Inorder traversal of a binary tree, L to R
-  # Since recursive iterators are not yet implemented,
-  # this uses an explicit stack (which is more efficient anyway):
+  ## Inorder traversal of the tree at `root`, i.e., from smallest to largest key
+  # Since recursive iterators are not yet implemented, this uses an explicit stack 
   var stack: seq[BBTree[K,V]] = @[]
   var curr = root
   while curr != nil or stack.len > 0:
@@ -420,9 +429,8 @@ iterator inorder*[K,V](root: BBTree[K,V]): (K,V) =
     curr = curr.right # now go right
 
 iterator revorder*[K,V](root: BBTree[K,V]): (K,V) =
-  # Reverse inorder traversal of a binary tree, R to L
-  # Since recursive iterators are not yet implemented,
-  # this uses an explicit stack (which is more efficient anyway):
+  ## Reverse inorder traversal of the tree at `root`, i.e., from largest to smallest key
+  # Since recursive iterators are not yet implemented, this uses an explicit stack
   var stack: seq[BBTree[K,V]] = @[]
   var curr = root
   while curr != nil or stack.len > 0:
@@ -439,7 +447,7 @@ iterator revorder*[K,V](root: BBTree[K,V]): (K,V) =
 ]#
 
 func countKeys*[K,V](root: BBTree[K,V]): int =
-    ## Used for unit testing only; use `len` to get the number of keys.
+    ## Used for unit testing only; normally use `len` to get the number of keys.
     var node = root
     result = 0
     while node != nil:
@@ -478,6 +486,8 @@ func balanced[K,V](node: BBTree[K,V]): int = # returns size in nodes or -1 for e
     return sz
 
 func isBalanced*[K,V](root: BBTree[K,V]): bool =
+    ## Used for unit testing only; returns `true` if the tree is balanced, which should always
+    ## be the case.
     let size = balanced(root)
     if root == nil:
         return (size == 0)
