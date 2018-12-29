@@ -105,6 +105,9 @@ suite "test int,int bbtree.nim":
         check(isBalanced(root))
         check(len(root) == 44)
         check(countKeys(root) == 44)
+        check(rank(root,1,-99) == 0)
+        for i in 2..44:
+            check(rank(root,i,-99) == i-1)
         # for code coverage...
         for i in 2..45:
             let (k,v) = getPrev(root,i,(-99,99))

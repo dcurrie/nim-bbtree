@@ -11,6 +11,7 @@ with a nice combination of properties:
 * Insert (`add`), lookup (`get`), and delete (`del`) in O(log(N)) time
 * Key-ordered iterators (`inorder` and `revorder`)
 * Lookup by relative position from beginning or end (`getNth`) in O(log(N)) time
+* Get the position (`rank`) by key in O(log(N)) time
 * Efficient set operations TODO
 
 By "persistent" we mean that the BBTree always preserves the previous version of itself when it is modified. 
@@ -51,9 +52,9 @@ Department of Applied Mathematics Charles University in Prague, Czech Republic
 
 ### Code coverage test
 
-    $nimble coverage
-
 Requires [coco](https://github.com/samuelroy/coco).
+
+    $nimble coverage
 
 ### License
 

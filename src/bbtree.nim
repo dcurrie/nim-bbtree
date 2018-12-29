@@ -367,9 +367,30 @@ func delMax*[K,V](root: BBTree[K,V]): BBTree[K,V] =
         discard maxv
         result = node
 
+#[ ****************************** rank ***********************************
+]#
+
+func rank*[K,V](root: BBTree[K,V], key: K, default: int): int =
+    ## retrieves the 0-based index of `key` in the tree `root` iff `key` is in the tree. 
+    ## Otherwise, `default` is returned. O(log N)
+    result = default
+    var n = 0
+    var node = root
+    while node != nil:
+        let dif = cmp(key, node.key);
+        if (dif < 0):
+            node = node.left
+        elif (dif > 0):
+            n += 1 + nodeSize(node.left)
+            node = node.right
+        else: # key and node.key are eq
+            result = n + nodeSize(node.left)
+            node = nil # break
+
 #[ **************************** iterators ********************************
 ]#
 
+#[ useless!?...
 iterator preorder*[K,V](root: BBTree[K,V]): (K,V) =
   # Preorder traversal of a binary tree.
   # Since recursive iterators are not yet implemented,
@@ -381,6 +402,7 @@ iterator preorder*[K,V](root: BBTree[K,V]): (K,V) =
       yield (curr.key, curr.val)
       add(stack, curr.right)  # push right subtree onto the stack
       curr = curr.left        # and follow the left pointer
+]#
 
 iterator inorder*[K,V](root: BBTree[K,V]): (K,V) =
   # Inorder traversal of a binary tree, L to R
