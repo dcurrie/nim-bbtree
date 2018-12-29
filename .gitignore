@@ -1,1 +1,4 @@
 nimcache/
+coverage/
+lcov.info
+.DS_Store
