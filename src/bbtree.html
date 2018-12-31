@@ -1303,6 +1303,8 @@ function main() {
     title="disjoint[K, V](tree1, tree2: BBTree[K, V]): bool"><wbr />disjoint<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#isProperSubset%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
     title="isProperSubset[K, U, V](tree1: BBTree[K, U]; tree2: BBTree[K, V]): bool"><wbr />is<wbr />Proper<wbr />Subset<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#setEqual%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
+    title="setEqual[K, U, V](tree1: BBTree[K, U]; tree2: BBTree[K, V]): bool"><wbr />set<wbr />Equal<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#%2B%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
     title="`+`[K, V](s1, s2: BBTree[K, V]): BBTree[K, V]"><wbr />`+`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#%2A%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
@@ -1315,6 +1317,8 @@ function main() {
     title="`&lt;`[K, U, V](s1: BBTree[K, U]; s2: BBTree[K, V]): bool"><wbr />`&lt;`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#%3C%3D%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
     title="`&lt;=`[K, U, V](s1: BBTree[K, U]; s2: BBTree[K, V]): bool"><wbr />`&lt;=`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#%3D%3F%3D%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
+    title="`=?=`[K, U, V](s1: BBTree[K, U]; s2: BBTree[K, V]): bool"><wbr />`=?=`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#toSet%2CopenArray%5BK%5D"
     title="toSet[K](keys: openArray[K]): BBTree[K, bool]"><wbr />to<wbr />Set<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#countKeys%2CBBTree%5BK%2CV%5D"
@@ -1516,6 +1520,12 @@ Returns true iff <cite>tree1</cite> and <cite>tree2</cite> have no keys in commo
 Returns true iff the keys in <cite>tree1</cite> form a proper subset of the keys in <cite>tree2</cite>. In other words, if all the keys that are in <cite>tree1</cite> are also in <cite>tree2</cite>, but there are keys in <cite>tree2</cite> that are not in <cite>tree1</cite>.  O(N) where N is <cite>len(tree1)</cite>
 
 </dd>
+<a id="setEqual,BBTree[K,U],BBTree[K,V]"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">setEqual</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">tree1</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">tree2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span></pre></dt>
+<dd>
+Returns true if both <cite>tree1</cite> and <cite>tree2</cite> have the same keys.
+
+</dd>
 <a id="+,BBTree[K,V],BBTree[K,V]"></a>
 <dt><pre><span class="Keyword">func</span> <span class="Identifier">`+`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">,</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
@@ -1554,6 +1564,12 @@ Alias for <a class="reference external" href="#symmetricDifference,BBTree[K,V],B
 <p>Alias for <a class="reference external" href="#isSubset,BBTree[K,U],BBTree[K,V]">isSubset(s1, s2)</a>. Returns true if <cite>s1</cite> is subset of <cite>s2</cite>.</p>
 <p>A subset <cite>s1</cite> has all of its members in <cite>ts2</cite> and <cite>s2</cite> doesn't necessarily have more members than <cite>s1</cite>. That is, <cite>s1</cite> can be equal to <cite>s2</cite>.</p>
 
+
+</dd>
+<a id="=?=,BBTree[K,U],BBTree[K,V]"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">`=?=`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
+<dd>
+Alias for <a class="reference external" href="#setEqual,BBTree[K,U],BBTree[K,V]">setEqual(s1, s2)</a>. Returns true if both <cite>s1</cite> and <cite>s2</cite> have the same keys and set size.
 
 </dd>
 <a id="toSet,openArray[K]"></a>
@@ -1605,7 +1621,7 @@ Reverse inorder traversal of the tree at <cite>root</cite>, i.e., from largest t
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2018-12-31 21:15:30 UTC</small>
+        <small>Made with Nim. Generated: 2018-12-31 23:24:30 UTC</small>
       </div>
     </div>
   </div>

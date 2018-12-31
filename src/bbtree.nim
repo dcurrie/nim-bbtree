@@ -499,7 +499,7 @@ func join[K,V](key: K, val: V, left, right: BBTree[K,V]): BBTree[K,V] =
         if (omega * sl) < sr:
             result = balance(join(key, val, left, right.left), right.key, right.val, right.right)
         elif (omega * sr) < sl:
-            result = balance(left.left, left.key, left.val, join(key, val, right, left.right))
+            result = balance(left.left, left.key, left.val, join(key, val, left.right, right))
         else:
             result = newNode(left, key, val, right)
 
@@ -602,7 +602,7 @@ func symmetricDifference*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
         if b:
             result = join(symmetricDifference(l, tree2.left), symmetricDifference(r, tree2.right))
         else:
-            result = join(tree1.key, tree1.val, symmetricDifference(l, tree2.left), symmetricDifference(r, tree2.right))
+            result = join(tree2.key, tree2.val, symmetricDifference(l, tree2.left), symmetricDifference(r, tree2.right))
 
 func contains*[K,V](root: BBTree[K,V], key: K): bool =
     ## Returns `true` if the `key` is in the tree `root`
@@ -700,6 +700,10 @@ func isProperSubset*[K,U,V](tree1: BBTree[K,U], tree2: BBTree[K,V]): bool =
     ## keys in `tree2` that are not in `tree1`.  O(N) where N is `len(tree1)`
     result = isSubset(tree1, tree2) and len(tree1) < len(tree2)
 
+func setEqual*[K,U,V](tree1: BBTree[K,U], tree2: BBTree[K,V]): bool =
+    ## Returns true if both `tree1` and `tree2` have the same keys.
+    result = len(tree1) == len(tree2) and isSubset(tree1, tree2)
+
 func `+`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
     ## Alias for `union(s1, s2) <#union,BBTree[K,V],BBTree[K,V]>`_.
     result = union(s1, s2)
@@ -736,13 +740,17 @@ func `<=`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
 
 #[
 #  `==` seems like an extreme assertion when values are not being considered...
-#  but this is compatible with MIT/Scheme wttree and consistent with Nim's set API.
+#  but this would be consistent with Nim's set API.
 #  Unfortunately it does not type check despite being identical to `<=`
 
 func `==`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
     ## Returns true if both `s1` and `s2` have the same keys and set size.
     result = isSubset(s1, s2) and len(s1) == len(s2)
 ]#
+func `=?=`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
+    ## Alias for `setEqual(s1, s2) <#setEqual,BBTree[K,U],BBTree[K,V]>`_.
+    ## Returns true if both `s1` and `s2` have the same keys and set size.
+    result = setEqual(s1, s2)
 
 #[ **************************** convenience funcs ********************************
 ]#
