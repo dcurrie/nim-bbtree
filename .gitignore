@@ -2,3 +2,5 @@ nimcache/
 coverage/
 lcov.info
 .DS_Store
+
+/tests/testbbtree

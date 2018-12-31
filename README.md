@@ -12,7 +12,8 @@ with a nice combination of properties:
 * Key-ordered iterators (`inorder` and `revorder`)
 * Lookup by relative position from beginning or end (`getNth`) in O(log(N)) time
 * Get the position (`rank`) by key in O(log(N)) time
-* Efficient set operations TODO
+* Efficient set operations using tree keys
+* Map extensions to set operations with optional value merge control for duplicates
 
 By "persistent" we mean that the BBTree always preserves the previous version of itself when it is modified. 
 As such it is effectively immutable, as the operations do not (visibly) update the structure in-place, 
@@ -30,14 +31,16 @@ in another until the modified tree is shared once again).
 
 References:
 
-Implementing Sets Efficiently in a Functional Language
+*Implementing Sets Efficiently in a Functional Language*
 Stephen Adams
 CSTR 92-10
 Department of Electronics and Computer Science University of Southampton Southampton S09 5NH
 
-Adams’ Trees Revisited Correct and Efficient Implementation
+*Adams’ Trees Revisited Correct and Efficient Implementation*
 Milan Straka
-Department of Applied Mathematics Charles University in Prague, Czech Republic
+Department of Applied Mathematics https://en.wikipedia.org/wiki/Weight-balanced_tree)Charles University in Prague, Czech Republic
+
+[Weight-balanced trees](https://en.wikipedia.org/wiki/Weight-balanced_tree) on Wikipedia
 
 
 ## BBTree Details

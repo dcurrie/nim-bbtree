@@ -156,6 +156,7 @@ suite "test int,int bbtree.nim":
         while n > 0:
             let i = rand(rand0, n-1)
             let (k0,v0) = getNth(root,i,(-99,99))
+            discard v0
             check(k0 != -99)
             root = del(root, k0)
             let v1 = get(root,k0,99)

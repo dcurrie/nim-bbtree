@@ -39,7 +39,8 @@ Department of Applied Mathematics Charles University in Prague, Czech Republic
 ## * Key-ordered iterators (``inorder`` and ``revorder``)
 ## * Lookup by relative position from beginning or end (``getNth``) in O(log(N)) time
 ## * Get the position (``rank``) by key in O(log(N)) time
-## * Efficient set operations **TODO**
+## * Efficient set operations using tree keys
+## * Map extensions to set operations with optional value merge control for duplicates
 
 type
     BBTree*[K,V] = ref object   # BBTree is a generic type with keys and values of types K, V
@@ -178,10 +179,10 @@ func get*[K,V](root: BBTree[K,V], key: K, default: V): V =
     result = default
     var node = root
     while node != nil:
-        let dif = cmp(key, node.key);
-        if (dif < 0):
+        let dif = cmp(key, node.key)
+        if dif < 0:
             node = node.left
-        elif (dif > 0):
+        elif dif > 0:
             node = node.right
         else: # key and node.key are eq
             result = node.val
@@ -442,6 +443,266 @@ iterator revorder*[K,V](root: BBTree[K,V]): (K,V) =
     yield (curr.key, curr.val)
     curr = curr.left # now go left
 
+
+#[ **************************** set operations ********************************
+]#
+
+# This is Adams's concat3
+#
+func join[K,V](key: K, val: V, left, right: BBTree[K,V]): BBTree[K,V] =
+    if left == nil:
+        result = add(right, key, val)
+    elif right == nil:
+        result = add(left, key, val)
+    else:
+        let sl = nodeSize(left)
+        let sr = nodeSize(right)
+        if (omega * sl) < sr:
+            result = balance(join(key, val, left, right.left), right.key, right.val, right.right)
+        elif (omega * sr) < sl:
+            result = balance(left.left, left.key, left.val, join(key, val, right, left.right))
+        else:
+            result = newNode(left, key, val, right)
+
+# This is Adams's concat
+#
+func join[K,V](left, right: BBTree[K,V]): BBTree[K,V] =
+    if left == nil:
+        result = right
+    elif right == nil:
+        result =left
+    else:
+        let (key, val, rightp) = extractMin(right)
+        result = join(key, val, left, rightp)
+
+# This is Adams's split_lt and split_gt combined into one function, along with contains(root, key)
+#
+func split[K,V](key: K, root: BBTree[K,V]): (BBTree[K,V], bool, BBTree[K,V]) =
+    if root == nil:
+        result = (root, false, root)
+    else:
+        let dif = cmp(key, root.key)
+        if dif < 0:
+            let (l, b, r) = split(key, root.left)
+            result = (l, b, join(root.key, root.val, r, root.right))
+        elif dif > 0:
+            let (l, b, r) = split(key, root.right)
+            result = (join(root.key, root.val, root.left, l), b, r)
+        else: # key and node.key are eq
+            result = (root.left, true, root.right)
+
+func splitMerge[K,V](key: K, val: V, root: BBTree[K,V], merge: func (k: K, v1, v2: V): V): 
+    (BBTree[K,V], bool, V, BBTree[K,V]) =
+    if root == nil:
+        result = (root, false, val, root)
+    else:
+        let dif = cmp(key, root.key)
+        if dif < 0:
+            let (l, b, val, r) = splitMerge(key, val, root.left, merge)
+            result = (l, b, val, join(root.key, root.val, r, root.right))
+        elif dif > 0:
+            let (l, b, val, r) = splitMerge(key, val, root.right, merge)
+            result = (join(root.key, root.val, root.left, l), b, val, r)
+        else: # key and node.key are eq
+            result = (root.left, true, merge(key, val, root.val), root.right)
+
+func union*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
+    ## Returns the union of the sets represented by the keys in `tree1` and `tree2`.
+    ## When viewed as maps, returns the key,value pairs that appear in either tree; if
+    ## a key appears in both trees, the value for that key is selected from `tree1`, so
+    ## this function is asymmetrical for maps. If you need more comtrol over how the 
+    ## values are selected for duplicate keys, see `unionMerge`. O(M + N) but if the minimum
+    ## key of one tree is greater than the maximum key of the other tree then O(log M) 
+    ## where M is the size of the larger tree.
+    if tree1 == nil:
+        result = tree2
+    elif tree2 == nil:
+        result = tree1
+    else:
+        let (l, b, r) = split(tree1.key, tree2)
+        discard b
+        result = join(tree1.key, tree1.val, union(tree1.left, l), union(tree1.right, r))
+
+func unionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v2: V): V): BBTree[K,V] =
+    ## Returns the union of the sets represented by the keys in `tree1` and `tree2`.
+    ## When viewed as maps, returns the key,value pairs that appear in either tree; if
+    ## a key appears in both trees, the value for that key is the result of the supplied
+    ## `merge` function, which is passed the common key, and the values from `tree1` and 
+    ## `tree2` respectively.  O(M + N) but if the minimum
+    ## key of one tree is greater than the maximum key of the other tree then O(log M) 
+    ## where M is the size of the larger tree.
+    if tree1 == nil:
+        result = tree2
+    elif tree2 == nil:
+        result = tree1
+    else:
+        let (l, b, v, r) = splitMerge(tree1.key, tree1.val, tree2, merge)
+        discard b
+        result = join(tree1.key, v, unionMerge(tree1.left, l, merge), unionMerge(tree1.right, r, merge))
+
+func difference*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
+    ## Returns the asymmetric set difference between `tree1` and `tree2`. In other words, 
+    ## returns the keys that are in `tree1`, but not in `tree2`.  O(M + N)
+    if tree1 == nil or tree2 == nil:
+        result = tree1
+    else:
+        let (l, b, r) = split(tree2.key, tree1)
+        discard b
+        result = join(difference(l, tree2.left), difference(r, tree2.right))
+
+func symmetricDifference*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
+    ## Returns the symmetric set difference between `tree1` and `tree2`. In other words, 
+    ## returns the keys that are in `tree1`, but not in `tree2`, union the keys that are in 
+    ## `tree2` but not in `tree1`.  O(M + N)
+    if tree1 == nil:
+        result = tree2
+    if tree2 == nil:
+        result = tree1
+    else:
+        let (l, b, r) = split(tree2.key, tree1)
+        if b:
+            result = join(symmetricDifference(l, tree2.left), symmetricDifference(r, tree2.right))
+        else:
+            result = join(tree1.key, tree1.val, symmetricDifference(l, tree2.left), symmetricDifference(r, tree2.right))
+
+func contains*[K,V](root: BBTree[K,V], key: K): bool =
+    ## Returns `true` if the `key` is in the tree `root`
+    ## otherwise `false`. O(log N)
+    result = false
+    var node = root
+    while node != nil:
+        let dif = cmp(key, node.key)
+        if dif < 0:
+            node = node.left
+        elif dif > 0:
+            node = node.right
+        else: # key and node.key are eq
+            result = true
+            node = nil # break
+
+func intersection*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
+    ## Returns the set intersection of `tree1` and `tree2`. In other words, returns the keys
+    ## that are in both trees. 
+    ## When viewed as maps, returns the key,value pairs for keys that appear in both trees; 
+    ## the value each key is selected from `tree1`, so
+    ## this function is asymmetrical for maps. If you need more comtrol over how the 
+    ## values are selected for duplicate keys, see `uintersectionMerge`. O(M + N)
+    if tree1 == nil:
+        result = tree1
+    if tree2 == nil:
+        result = tree2
+    else:
+        let (l, b, r) = split(tree1.key, tree2)
+        if b:
+            result = join(tree1.key, tree1.val, intersection(tree1.left, l), intersection(tree1.right, r))
+        else:
+            result = join(intersection(tree1.left, l), intersection(tree1.right, r))
+
+func intersectionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v2: V): V): BBTree[K,V] =
+    ## Returns the set intersection of `tree1` and `tree2`. In other words, returns the keys
+    ## that are in both trees. 
+    ## When viewed as maps, returns the key,value pairs for keys that appear in both trees; 
+    ## the value for each key is the result of the supplied
+    ## `merge` function, which is passed the common key, and the values from `tree1` and 
+    ## `tree2` respectively.  O(M + N)
+    if tree1 == nil:
+        result = tree1
+    if tree2 == nil:
+        result = tree2
+    else:
+        let (l, b, v, r) = splitMerge(tree1.key, tree2, merge)
+        if b:
+            result = join(tree1.key, v, intersectionMerge(tree1.left, l, merge), intersectionMerge(tree1.right, r, merge))
+        else:
+            result = join(intersectionMerge(tree1.left, l, merge), intersectionMerge(tree1.right, r, merge))
+
+func isSubset*[K,V](tree1, tree2: BBTree[K,V]): bool =
+    ## Returns true iff the keys in `tree1` form a subset of the keys in `tree2`. In other words, 
+    ## if all the keys that are in `tree1` are also in `tree2`. O(N) where N is `len(tree1)`
+    ## Use `isProperSubset` instead to determins that there are keys in `tree2` that are not in `tree1`.
+    if tree1 == nil:
+        result = true
+    elif len(tree1) > len(tree2):
+        result = false
+    else:
+        # tree2 is not nil or else the above length test would have been true
+        let dif = cmp(tree1.key, tree2.key)
+        if dif < 0:
+            result = isSubset(tree1.left, tree2.left) and
+                     tree2.contains(tree1.key) and
+                     isSubset(tree1.right, tree2)
+        elif dif > 0:
+            result = isSubset(tree1.right, tree2.right) and
+                     tree2.contains(tree1.key) and 
+                     isSubset(tree1.left, tree2)
+        else: # tree1.key and tree2.key are eq
+            result = isSubset(tree1.left, tree2.left) and isSubset(tree1.right, tree2.right)
+
+func disjoint*[K,V](tree1, tree2: BBTree[K,V]): bool =
+    ## Returns true iff `tree1` and `tree2` have no keys in common. O(N) where N is
+    ## `len(tree1)`
+    result = true # default
+    if tree1 != nil and tree2 != nil:
+        let dif = cmp(tree1.key, tree2.key)
+        if dif < 0:
+            if not disjoint(tree1.left, tree2.left): return false
+            if tree2.contains(tree1.key): return false
+            return disjoint(tree1.right, tree2)
+        elif dif > 0:
+            if not disjoint(tree1.right, tree2.right): return false
+            if tree2.contains(tree1.key): return false 
+            return disjoint(tree1.left, tree2)
+        else: # tree1.key and tree2.key are eq
+            return false
+
+func isProperSubset*[K,V](tree1, tree2: BBTree[K,V]): bool =
+    ## Returns true iff the keys in `tree1` form a proper subset of the keys in `tree2`. 
+    ## In other words, if all the keys that are in `tree1` are also in `tree2`, but there are 
+    ## keys in `tree2` that are not in `tree1`.  O(N) where N is `len(tree1)`
+    result = isSubset(tree1, tree2) and len(tree1) < len(tree2)
+
+func `+`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
+    ## Alias for `union(s1, s2) <#union>`_.
+    result = union(s1, s2)
+
+func `*`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
+    ## Alias for `intersection(s1, s2) <#intersection>`_.
+    result = intersection(s1, s2)
+
+func `-`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
+    ## Alias for `difference(s1, s2) <#difference>`_.
+    result = difference(s1, s2)
+
+# A -+- B  ==  (A - B) + (B - A)  ==  (A + B) - (A * B)
+
+func `-+-`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
+    ## Alias for `symmetricDifference(s1, s2) <#symmetricDifference>`_.
+    result = symmetricDifference(s1, s2)
+
+func `<`*[K,V](s1, s2: BBTree[K,V]): bool {.inline.} =
+    ## Alias for `isProperSubset(s1, s2) <#isProperSubset>`_.
+    ## Returns true if the keys in `s1` form a strict or proper subset of the keys in `s2`.
+    ##
+    ## A strict or proper subset `s1` has all of its keys in `s2` but `s2` has
+    ## more elements than `s1`.
+    result = isProperSubset(s1, s2)
+
+func `<=`*[K,V](s1, s2: BBTree[K,V]): bool {.inline.} =
+    ## Alias for `isSubset(s1, s2) <#isSubset>`_.
+    ## Returns true if `s1` is subset of `s2`.
+    ##
+    ## A subset `s1` has all of its members in `ts2` and `s2` doesn't necessarily
+    ## have more members than `s1`. That is, `s1` can be equal to `s2`.
+    result = isSubset(s1, s2)
+
+#[
+#  `==` seems like an extreme assertion when values are not being considered...
+#  Furhtermore, it messes up all the tests for `== nil` above turning them into infinite regress
+#
+func `==`*[K,V](s1, s2: BBTree[K,V]): bool {.inline.} =
+    ## Returns true if both `s1` and `s2` have the same keys and set size.
+    result = isSubset(s1, s2) and len(s1) == len(s2)
+]#
 
 #[ **************************** for unit tests ********************************
 ]#
