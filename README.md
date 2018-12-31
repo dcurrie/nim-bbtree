@@ -38,12 +38,18 @@ Department of Electronics and Computer Science University of Southampton Southam
 
 *Adams’ Trees Revisited Correct and Efficient Implementation*
 Milan Straka
-Department of Applied Mathematics https://en.wikipedia.org/wiki/Weight-balanced_tree)Charles University in Prague, Czech Republic
+Department of Applied Mathematics Charles University in Prague, Czech Republic
 
 [Weight-balanced trees](https://en.wikipedia.org/wiki/Weight-balanced_tree) on Wikipedia
 
 
 ## BBTree Details
+
+### Documentation
+
+    $nim doc src/bbtree.nim
+
+[On line documentation](src/bbtree.html)
 
 ### Installation
 
