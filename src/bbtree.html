@@ -1315,6 +1315,8 @@ function main() {
     title="`&lt;`[K, U, V](s1: BBTree[K, U]; s2: BBTree[K, V]): bool"><wbr />`&lt;`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#%3C%3D%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
     title="`&lt;=`[K, U, V](s1: BBTree[K, U]; s2: BBTree[K, V]): bool"><wbr />`&lt;=`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#toSet%2CopenArray%5BK%5D"
+    title="toSet[K](keys: openArray[K]): BBTree[K, bool]"><wbr />to<wbr />Set<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#countKeys%2CBBTree%5BK%2CV%5D"
     title="countKeys[K, V](root: BBTree[K, V]): int"><wbr />count<wbr />Keys<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#isBalanced%2CBBTree%5BK%2CV%5D"
@@ -1554,6 +1556,16 @@ Alias for <a class="reference external" href="#symmetricDifference,BBTree[K,V],B
 
 
 </dd>
+<a id="toSet,openArray[K]"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">toSet</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">keys</span><span class="Other">:</span> <span class="Identifier">openArray</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">bool</span><span class="Other">]</span></pre></dt>
+<dd>
+<p>Creates a BBTree set that contains the given <cite>keys</cite> with value <cite>true</cite>.</p>
+<p>Example:</p>
+<pre class="listing"><span class="Keyword">var</span> <span class="Identifier">numbers</span> <span class="Punctuation">:</span> <span class="Identifier">BBTree</span><span class="Punctuation">[</span><span class="Identifier">int</span><span class="Punctuation">,</span><span class="Identifier">bool</span><span class="Punctuation">]</span> <span class="Operator">=</span> <span class="Identifier">toSet</span><span class="Punctuation">(</span><span class="Punctuation">[</span><span class="DecNumber">1</span><span class="Punctuation">,</span> <span class="DecNumber">2</span><span class="Punctuation">,</span> <span class="DecNumber">3</span><span class="Punctuation">,</span> <span class="DecNumber">4</span><span class="Punctuation">,</span> <span class="DecNumber">5</span><span class="Punctuation">]</span><span class="Punctuation">)</span>
+<span class="Identifier">assert</span> <span class="Identifier">numbers</span><span class="Operator">.</span><span class="Identifier">contains</span><span class="Punctuation">(</span><span class="DecNumber">2</span><span class="Punctuation">)</span>
+<span class="Identifier">assert</span> <span class="Identifier">numbers</span><span class="Operator">.</span><span class="Identifier">contains</span><span class="Punctuation">(</span><span class="DecNumber">4</span><span class="Punctuation">)</span></pre>
+
+</dd>
 <a id="countKeys,BBTree[K,V]"></a>
 <dt><pre><span class="Keyword">func</span> <span class="Identifier">countKeys</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">root</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">int</span></pre></dt>
 <dd>
@@ -1593,7 +1605,7 @@ Reverse inorder traversal of the tree at <cite>root</cite>, i.e., from largest t
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2018-12-31 20:25:58 UTC</small>
+        <small>Made with Nim. Generated: 2018-12-31 21:15:30 UTC</small>
       </div>
     </div>
   </div>

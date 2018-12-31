@@ -222,6 +222,7 @@ suite "test map and fold bbtree.nim":
         check(root <= t2)
         for k,v in revorder(t2):
             check(root.contains(k))
+            check(k in root) # alt syntax using `in` template
             check(v.is(string))
             let s = split(v, {':'})
             check($k == s[0])
@@ -229,6 +230,59 @@ suite "test map and fold bbtree.nim":
         for k,v in revorder(root):
             check(t2.contains(k))
             check(v.is(int))
+
+suite "test set funcs of bbtree.nim":
+
+    test "toSet":
+       var numbers : BBTree[int,bool] = toSet([1, 2, 3, 4, 5])
+       check(numbers.contains(2))
+       check(numbers.contains(4))
+
+    test "Nim compat":
+        var
+            a : BBTree[string,bool] = toSet(["a", "b"])
+            b : BBTree[string,bool] = toSet(["b", "c"])
+            c = union(a, b)
+        # `==` not working yet, so check twice, <= and >=
+        check(c <= toSet(["a", "b", "c"]))
+        check(c >= toSet(["a", "b", "c"]))
+        var d = intersection(a, b)
+        check(d <= toSet(["b"]))
+        check(d >= toSet(["b"]))
+        var e = difference(a, b)
+        check(e <= toSet(["a"]))
+        check(e >= toSet(["a"]))
+        var f = symmetricDifference(a, b)
+        check(f <= toSet(["a", "c"]))
+        check(f >= toSet(["a", "c"]))
+        check(d < a and d < b)
+        check((a < a) == false)
+        check(d <= a and d <= b)
+        check((a <= a))
+        # Alias test.
+        check(a + b <= toSet(["a", "b", "c"]))
+        check(a + b >= toSet(["a", "b", "c"]))
+        check(a * b <= toSet(["b"]))
+        check(a * b >= toSet(["b"]))
+        check(a - b <= toSet(["a"]))
+        check(a - b >= toSet(["a"]))
+        check(a -+- b <= toSet(["a", "c"]))
+        check(a -+- b >= toSet(["a", "c"]))
+        check(disjoint(a, b) == false)
+        check(disjoint(a, b - a) == true)
+
+    test "Pairs as keys":
+        type pair = tuple[a, b: int]
+        var aa : BBTree[pair,bool]
+        var bb : BBTree[pair,bool]
+        var x = (a:1,b:2)
+        var y = (a:3,b:4)
+        aa = aa.add(x, true)
+        aa = aa.add(y, true)
+        bb = bb.add(x, true)
+        bb = bb.add(y, true)
+        check(aa <= bb)
+        check(aa >= bb)
 
 
 

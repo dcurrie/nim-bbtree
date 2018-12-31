@@ -595,7 +595,7 @@ func symmetricDifference*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
     ## `tree2` but not in `tree1`.  O(M + N)
     if tree1.isNil:
         result = tree2
-    if tree2.isNil:
+    elif tree2.isNil:
         result = tree1
     else:
         let (l, b, r) = split(tree2.key, tree1)
@@ -628,7 +628,7 @@ func intersection*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
     ## values are selected for duplicate keys, see `uintersectionMerge`. O(M + N)
     if tree1.isNil:
         result = tree1
-    if tree2.isNil:
+    elif tree2.isNil:
         result = tree2
     else:
         let (l, b, r) = split(tree1.key, tree2)
@@ -646,7 +646,7 @@ func intersectionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v
     ## `tree2` respectively.  O(M + N)
     if tree1.isNil:
         result = tree1
-    if tree2.isNil:
+    elif tree2.isNil:
         result = tree2
     else:
         let (l, b, v, r) = splitMerge(tree1.key, tree2, merge)
@@ -743,6 +743,21 @@ func `==`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
     ## Returns true if both `s1` and `s2` have the same keys and set size.
     result = isSubset(s1, s2) and len(s1) == len(s2)
 ]#
+
+#[ **************************** convenience funcs ********************************
+]#
+
+func toSet*[K](keys: openArray[K]): BBTree[K,bool] =
+  ## Creates a BBTree set that contains the given `keys` with value `true`.
+  ##
+  ## Example:
+  ##
+  ## .. code-block::
+  ##   var numbers : BBTree[int,bool] = toSet([1, 2, 3, 4, 5])
+  ##   assert numbers.contains(2)
+  ##   assert numbers.contains(4)
+  result = nil
+  for key in items(keys): result = add(result, key, true)
 
 #[ **************************** for unit tests ********************************
 ]#
