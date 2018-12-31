@@ -51,6 +51,8 @@ Department of Applied Mathematics Charles University in Prague, Czech Republic
 
 [On line documentation](src/bbtree.html)
 
+{"gitdown": "include", "file": "./LICENSE.md"}
+
 ### Installation
 
     $nimble install nim-bbtree # TODO
