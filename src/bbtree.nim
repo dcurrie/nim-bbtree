@@ -44,6 +44,7 @@ Department of Applied Mathematics Charles University in Prague, Czech Republic
 
 type
     BBTree*[K,V] = ref object   # BBTree is a generic type with keys and values of types K, V
+        ## `BBTree` is an opaque immutable type.
         left:  BBTree[K,V]      # left subtree; may be nil
         right: BBTree[K,V]      # right subtree; may be nil
         size:  int              # the size of the (sub-)tree rooted in this node
@@ -55,7 +56,7 @@ const                           # balance criteria
     alpha = 2
 
 func nodeSize[K,V](n: BBTree[K,V]): int {.inline.} =
-    if n == nil:
+    if n.isNil:
         result = 0
     else:
         result = n.size
@@ -153,7 +154,7 @@ insert k (Node left _ key right) = case k ‘compare‘ key of
 func add*[K,V](root: BBTree[K,V], key: K, value: V): BBTree[K,V] =
     ## Returns a new tree with the (`key`, `value`) pair added, or replaced if `key` is already
     ## in the tree `root`. O(log N)
-    if root == nil:
+    if root.isNil:
         result = newLeaf(key, value)
     else:
         let dif = cmp(key, root.key);
@@ -218,7 +219,7 @@ func getMin*[K,V](root: BBTree[K,V], default: (K, V)): (K, V) =
     ## Retrieves the key,value pair with the smallest key in the tree `root`
     ## For an empty tree `default` is returned. O(log N)
     var node = root
-    if node == nil:
+    if node.isNil:
         result = default
     else:
         while node.left != nil:
@@ -229,7 +230,7 @@ func getMax*[K,V](root: BBTree[K,V], default: (K, V)): (K, V) =
     ## Retrieves the key,value pair with the largest key in the tree `root`
     ## For an empty tree `default` is returned. O(log N)
     var node = root
-    if node == nil:
+    if node.isNil:
         result = default
     else:
         while node.right != nil:
@@ -237,7 +238,7 @@ func getMax*[K,V](root: BBTree[K,V], default: (K, V)): (K, V) =
         result = (node.key, node.val)
 
 func getKV[K,V](node: BBTree[K,V], default: (K, V)): (K, V) {.inline.} =
-    if node == nil:
+    if node.isNil:
         result = default
     else:
         result = (node.key, node.val)
@@ -250,7 +251,7 @@ func getNext*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
     var node = root
     var done = false
     while not done:
-        if node == nil:
+        if node.isNil:
             result = getKV(last_left_from, default) # key not found
             done = true
         else:
@@ -262,7 +263,7 @@ func getNext*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
                 node = node.right
             else: # key and node.key are eq
                 # return value from min node of right subtree, or from last_left_from if none
-                if node.right == nil:
+                if node.right.isNil:
                     result = getKV(last_left_from, default)
                 else:
                     result = getMin(node.right, default)
@@ -276,7 +277,7 @@ func getPrev*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
     var node = root
     var done = false
     while not done:
-        if node == nil:
+        if node.isNil:
             result = getKV(last_right_from, default) # key not found
             done = true
         else:
@@ -288,7 +289,7 @@ func getPrev*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
                 node = node.right
             else: # key and node.key are eq
                 # return value from max node of left subtree, or from last_right_from if none
-                if node.left == nil:
+                if node.left.isNil:
                     result = getKV(last_right_from, default)
                 else:
                     result = getMax(node.left, default)
@@ -319,23 +320,23 @@ delete k (Node left _ key right) = case k ‘compare‘ key of
 ]#
 
 func extractMin[K,V](node: BBTree[K,V]): (K, V, BBTree[K,V]) = # (mink, minv, node')
-    if node.left == nil:
+    if node.left.isNil:
         result = (node.key, node.val, node.right)
     else:
         let (mink, minv, nodep) = extractMin(node.left)
         result = (mink, minv, balance(nodep, node.key, node.val, node.right))
 
 func extractMax[K,V](node: BBTree[K,V]): (K, V, BBTree[K,V]) = # (maxk, maxv, node')
-    if node.right == nil:
+    if node.right.isNil:
         result = (node.key, node.val, node.left)
     else:
         let (maxk, maxv, nodep) = extractMax(node.right)
         result = (maxk, maxv, balance(node.left, node.key, node.val, nodep))
 
 func glue[K,V](left: BBTree[K,V], right: BBTree[K,V]): BBTree[K,V] =
-    if left == nil:
+    if left.isNil:
         result = right
-    elif right == nil:
+    elif right.isNil:
         result = left
     elif nodeSize(left) > nodeSize(right):
         let (maxk, maxv, leftp) = extractMax(left)
@@ -347,7 +348,7 @@ func glue[K,V](left: BBTree[K,V], right: BBTree[K,V]): BBTree[K,V] =
 func del*[K,V](root: BBTree[K,V], key: K): BBTree[K,V] =
     ## Deletes `key` from tree `root`. Does nothing if the key does not exist.
     ## O(log N)
-    if root == nil:
+    if root.isNil:
         result = root
     else:
         let dif = cmp(key, root.key);
@@ -360,7 +361,7 @@ func del*[K,V](root: BBTree[K,V], key: K): BBTree[K,V] =
 
 func delMin*[K,V](root: BBTree[K,V]): BBTree[K,V] =
     ## Delete the minimum element from tree `root`. O(log N)
-    if root == nil:
+    if root.isNil:
         result = root
     else:
         let (mink, minv, node) = extractMin(root)
@@ -370,7 +371,7 @@ func delMin*[K,V](root: BBTree[K,V]): BBTree[K,V] =
 
 func delMax*[K,V](root: BBTree[K,V]): BBTree[K,V] =
     ## Delete the maximum element from tree `root`. O(log N)
-    if root == nil:
+    if root.isNil:
         result = root
     else:
         let (maxk, maxv, node) = extractMax(root)
@@ -416,33 +417,71 @@ iterator preorder*[K,V](root: BBTree[K,V]): (K,V) =
 ]#
 
 iterator inorder*[K,V](root: BBTree[K,V]): (K,V) =
-  ## Inorder traversal of the tree at `root`, i.e., from smallest to largest key
-  # Since recursive iterators are not yet implemented, this uses an explicit stack 
-  var stack: seq[BBTree[K,V]] = @[]
-  var curr = root
-  while curr != nil or stack.len > 0:
-    while curr != nil:
-        add(stack, curr) # push node before going left
-        curr = curr.left
-    # at the leftmost node; curr is nil
-    curr = stack.pop()
-    yield (curr.key, curr.val)
-    curr = curr.right # now go right
+    ## Inorder traversal of the tree at `root`, i.e., from smallest to largest key
+    # Since recursive iterators are not yet implemented, this uses an explicit stack 
+    var stack: seq[BBTree[K,V]] = @[]
+    var curr = root
+    while curr != nil or stack.len > 0:
+        while curr != nil:
+            add(stack, curr) # push node before going left
+            curr = curr.left
+        # at the leftmost node; curr is nil
+        curr = stack.pop()
+        yield (curr.key, curr.val)
+        curr = curr.right # now go right
 
 iterator revorder*[K,V](root: BBTree[K,V]): (K,V) =
-  ## Reverse inorder traversal of the tree at `root`, i.e., from largest to smallest key
-  # Since recursive iterators are not yet implemented, this uses an explicit stack
-  var stack: seq[BBTree[K,V]] = @[]
-  var curr = root
-  while curr != nil or stack.len > 0:
-    while curr != nil:
-        add(stack, curr) # push node before going right
-        curr = curr.right
-    # at the rightmost node; curr is nil
-    curr = stack.pop()
-    yield (curr.key, curr.val)
-    curr = curr.left # now go left
+    ## Reverse inorder traversal of the tree at `root`, i.e., from largest to smallest key
+    # Since recursive iterators are not yet implemented, this uses an explicit stack
+    var stack: seq[BBTree[K,V]] = @[]
+    var curr = root
+    while curr != nil or stack.len > 0:
+        while curr != nil:
+            add(stack, curr) # push node before going right
+            curr = curr.right
+        # at the rightmost node; curr is nil
+        curr = stack.pop()
+        yield (curr.key, curr.val)
+        curr = curr.left # now go left
 
+#[ **************************** fold & map ********************************
+]#
+
+# this is a proc to allow f to modify base of type T
+#
+func fold*[K,V,T](root: BBTree[K,V], f: proc (key: K, val: V, base: T): T, base: T): T =
+    ## Applies the proc `f` to each value of tree `root` in reverse order (right to left).
+    ## Uses the `base` value for the first rightmost operand. So, for example, to construct a
+    ## concatenated string of stringified tree values, you could use
+    ## 
+    ## .. code-block::
+    ## 
+    ##     fold(root, proc (k: int, v: int, b: string): string = discard k; $v & ";" &  b, "")
+    # Use explicit stack sice we have the logic from `revorder` above
+    var stack: seq[BBTree[K,V]] = @[]
+    var curr = root
+    result = base
+    while curr != nil or stack.len > 0:
+        while curr != nil:
+            add(stack, curr) # push node before going right
+            curr = curr.right
+        # at the rightmost node; curr is nil
+        curr = stack.pop()
+        result = f(curr.key, curr.val, result)
+        curr = curr.left # now go left
+
+func map*[K,V,T](root: BBTree[K,V], f: func (key: K, val: V): T): BBTree[K,T] =
+    ## Returns a new tree with the keys of tree `root` and values that are the result of 
+    ## applying `f` to each key and corresponding value. So, for example, to construct a
+    ## tree with values replaced by concatenated string of key,value pairs, you could use
+    ## 
+    ## .. code-block::
+    ## 
+    ##     map(root, proc (k: int, v: int): string = $k & ":" & $v)
+    if root.isNil:
+        result = nil
+    else:
+        result = newNode(map(root.left, f), root.key, f(root.key, root.val), map(root.right, f))
 
 #[ **************************** set operations ********************************
 ]#
@@ -450,9 +489,9 @@ iterator revorder*[K,V](root: BBTree[K,V]): (K,V) =
 # This is Adams's concat3
 #
 func join[K,V](key: K, val: V, left, right: BBTree[K,V]): BBTree[K,V] =
-    if left == nil:
+    if left.isNil:
         result = add(right, key, val)
-    elif right == nil:
+    elif right.isNil:
         result = add(left, key, val)
     else:
         let sl = nodeSize(left)
@@ -467,9 +506,9 @@ func join[K,V](key: K, val: V, left, right: BBTree[K,V]): BBTree[K,V] =
 # This is Adams's concat
 #
 func join[K,V](left, right: BBTree[K,V]): BBTree[K,V] =
-    if left == nil:
+    if left.isNil:
         result = right
-    elif right == nil:
+    elif right.isNil:
         result =left
     else:
         let (key, val, rightp) = extractMin(right)
@@ -478,7 +517,7 @@ func join[K,V](left, right: BBTree[K,V]): BBTree[K,V] =
 # This is Adams's split_lt and split_gt combined into one function, along with contains(root, key)
 #
 func split[K,V](key: K, root: BBTree[K,V]): (BBTree[K,V], bool, BBTree[K,V]) =
-    if root == nil:
+    if root.isNil:
         result = (root, false, root)
     else:
         let dif = cmp(key, root.key)
@@ -493,7 +532,7 @@ func split[K,V](key: K, root: BBTree[K,V]): (BBTree[K,V], bool, BBTree[K,V]) =
 
 func splitMerge[K,V](key: K, val: V, root: BBTree[K,V], merge: func (k: K, v1, v2: V): V): 
     (BBTree[K,V], bool, V, BBTree[K,V]) =
-    if root == nil:
+    if root.isNil:
         result = (root, false, val, root)
     else:
         let dif = cmp(key, root.key)
@@ -514,9 +553,9 @@ func union*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
     ## values are selected for duplicate keys, see `unionMerge`. O(M + N) but if the minimum
     ## key of one tree is greater than the maximum key of the other tree then O(log M) 
     ## where M is the size of the larger tree.
-    if tree1 == nil:
+    if tree1.isNil:
         result = tree2
-    elif tree2 == nil:
+    elif tree2.isNil:
         result = tree1
     else:
         let (l, b, r) = split(tree1.key, tree2)
@@ -531,9 +570,9 @@ func unionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v2: V): 
     ## `tree2` respectively.  O(M + N) but if the minimum
     ## key of one tree is greater than the maximum key of the other tree then O(log M) 
     ## where M is the size of the larger tree.
-    if tree1 == nil:
+    if tree1.isNil:
         result = tree2
-    elif tree2 == nil:
+    elif tree2.isNil:
         result = tree1
     else:
         let (l, b, v, r) = splitMerge(tree1.key, tree1.val, tree2, merge)
@@ -543,7 +582,7 @@ func unionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v2: V): 
 func difference*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
     ## Returns the asymmetric set difference between `tree1` and `tree2`. In other words, 
     ## returns the keys that are in `tree1`, but not in `tree2`.  O(M + N)
-    if tree1 == nil or tree2 == nil:
+    if tree1.isNil or tree2.isNil:
         result = tree1
     else:
         let (l, b, r) = split(tree2.key, tree1)
@@ -554,9 +593,9 @@ func symmetricDifference*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
     ## Returns the symmetric set difference between `tree1` and `tree2`. In other words, 
     ## returns the keys that are in `tree1`, but not in `tree2`, union the keys that are in 
     ## `tree2` but not in `tree1`.  O(M + N)
-    if tree1 == nil:
+    if tree1.isNil:
         result = tree2
-    if tree2 == nil:
+    if tree2.isNil:
         result = tree1
     else:
         let (l, b, r) = split(tree2.key, tree1)
@@ -587,9 +626,9 @@ func intersection*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
     ## the value each key is selected from `tree1`, so
     ## this function is asymmetrical for maps. If you need more comtrol over how the 
     ## values are selected for duplicate keys, see `uintersectionMerge`. O(M + N)
-    if tree1 == nil:
+    if tree1.isNil:
         result = tree1
-    if tree2 == nil:
+    if tree2.isNil:
         result = tree2
     else:
         let (l, b, r) = split(tree1.key, tree2)
@@ -605,9 +644,9 @@ func intersectionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v
     ## the value for each key is the result of the supplied
     ## `merge` function, which is passed the common key, and the values from `tree1` and 
     ## `tree2` respectively.  O(M + N)
-    if tree1 == nil:
+    if tree1.isNil:
         result = tree1
-    if tree2 == nil:
+    if tree2.isNil:
         result = tree2
     else:
         let (l, b, v, r) = splitMerge(tree1.key, tree2, merge)
@@ -616,11 +655,11 @@ func intersectionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v
         else:
             result = join(intersectionMerge(tree1.left, l, merge), intersectionMerge(tree1.right, r, merge))
 
-func isSubset*[K,V](tree1, tree2: BBTree[K,V]): bool =
+func isSubset*[K,U,V](tree1: BBTree[K,U], tree2: BBTree[K,V]): bool =
     ## Returns true iff the keys in `tree1` form a subset of the keys in `tree2`. In other words, 
     ## if all the keys that are in `tree1` are also in `tree2`. O(N) where N is `len(tree1)`
     ## Use `isProperSubset` instead to determins that there are keys in `tree2` that are not in `tree1`.
-    if tree1 == nil:
+    if tree1.isNil:
         result = true
     elif len(tree1) > len(tree2):
         result = false
@@ -655,40 +694,40 @@ func disjoint*[K,V](tree1, tree2: BBTree[K,V]): bool =
         else: # tree1.key and tree2.key are eq
             return false
 
-func isProperSubset*[K,V](tree1, tree2: BBTree[K,V]): bool =
+func isProperSubset*[K,U,V](tree1: BBTree[K,U], tree2: BBTree[K,V]): bool =
     ## Returns true iff the keys in `tree1` form a proper subset of the keys in `tree2`. 
     ## In other words, if all the keys that are in `tree1` are also in `tree2`, but there are 
     ## keys in `tree2` that are not in `tree1`.  O(N) where N is `len(tree1)`
     result = isSubset(tree1, tree2) and len(tree1) < len(tree2)
 
 func `+`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
-    ## Alias for `union(s1, s2) <#union>`_.
+    ## Alias for `union(s1, s2) <#union,BBTree[K,V],BBTree[K,V]>`_.
     result = union(s1, s2)
 
 func `*`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
-    ## Alias for `intersection(s1, s2) <#intersection>`_.
+    ## Alias for `intersection(s1, s2) <#intersection,BBTree[K,V],BBTree[K,V]>`_.
     result = intersection(s1, s2)
 
 func `-`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
-    ## Alias for `difference(s1, s2) <#difference>`_.
+    ## Alias for `difference(s1, s2) <#difference,BBTree[K,V],BBTree[K,V]>`_.
     result = difference(s1, s2)
 
 # A -+- B  ==  (A - B) + (B - A)  ==  (A + B) - (A * B)
 
 func `-+-`*[K,V](s1, s2: BBTree[K,V]): BBTree[K,V] {.inline.} =
-    ## Alias for `symmetricDifference(s1, s2) <#symmetricDifference>`_.
+    ## Alias for `symmetricDifference(s1, s2) <#symmetricDifference,BBTree[K,V],BBTree[K,V]>`_.
     result = symmetricDifference(s1, s2)
 
-func `<`*[K,V](s1, s2: BBTree[K,V]): bool {.inline.} =
-    ## Alias for `isProperSubset(s1, s2) <#isProperSubset>`_.
+func `<`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
+    ## Alias for `isProperSubset(s1, s2) <#isProperSubset,BBTree[K,U],BBTree[K,V]>`_.
     ## Returns true if the keys in `s1` form a strict or proper subset of the keys in `s2`.
     ##
     ## A strict or proper subset `s1` has all of its keys in `s2` but `s2` has
     ## more elements than `s1`.
     result = isProperSubset(s1, s2)
 
-func `<=`*[K,V](s1, s2: BBTree[K,V]): bool {.inline.} =
-    ## Alias for `isSubset(s1, s2) <#isSubset>`_.
+func `<=`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
+    ## Alias for `isSubset(s1, s2) <#isSubset,BBTree[K,U],BBTree[K,V]>`_.
     ## Returns true if `s1` is subset of `s2`.
     ##
     ## A subset `s1` has all of its members in `ts2` and `s2` doesn't necessarily
@@ -697,9 +736,10 @@ func `<=`*[K,V](s1, s2: BBTree[K,V]): bool {.inline.} =
 
 #[
 #  `==` seems like an extreme assertion when values are not being considered...
-#  Furhtermore, it messes up all the tests for `== nil` above turning them into infinite regress
-#
-func `==`*[K,V](s1, s2: BBTree[K,V]): bool {.inline.} =
+#  but this is compatible with MIT/Scheme wttree and consistent with Nim's set API.
+#  Unfortunately it does not type check despite being identical to `<=`
+
+func `==`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
     ## Returns true if both `s1` and `s2` have the same keys and set size.
     result = isSubset(s1, s2) and len(s1) == len(s2)
 ]#
@@ -717,7 +757,7 @@ func countKeys*[K,V](root: BBTree[K,V]): int =
         node = node.right
 
 func balanced[K,V](node: BBTree[K,V]): int = # returns size in nodes or -1 for error
-    if node == nil:
+    if node.isNil:
         return 0
     let
         sl = nodeSize(node.left)
@@ -750,7 +790,7 @@ func isBalanced*[K,V](root: BBTree[K,V]): bool =
     ## Used for unit testing only; returns `true` if the tree is balanced, which should always
     ## be the case.
     let size = balanced(root)
-    if root == nil:
+    if root.isNil:
         return (size == 0)
     return (size > 0) and (size == nodeSize(root))
 

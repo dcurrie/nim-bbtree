@@ -1278,6 +1278,10 @@ function main() {
     title="delMax[K, V](root: BBTree[K, V]): BBTree[K, V]"><wbr />del<wbr />Max<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#rank%2CBBTree%5BK%2CV%5D%2CK%2Cint"
     title="rank[K, V](root: BBTree[K, V]; key: K; default: int): int"><wbr />rank<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#fold%2CBBTree%5BK%2CV%5D%2Cproc%28K%2CV%2CT%29%2CT"
+    title="fold[K, V, T](root: BBTree[K, V]; f: proc (key: K; val: V; base: T): T; base: T): T"><wbr />fold<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#map%2CBBTree%5BK%2CV%5D%2Cproc%28K%2CV%29"
+    title="map[K, V, T](root: BBTree[K, V]; f: proc (key: K; val: V): T): BBTree[K, T]"><wbr />map<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#union%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
     title="union[K, V](tree1, tree2: BBTree[K, V]): BBTree[K, V]"><wbr />union<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#unionMerge%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D%2Cproc%28K%2CV%2CV%29"
@@ -1293,12 +1297,12 @@ function main() {
   <li><a class="reference" href="#intersectionMerge%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D%2Cproc%28K%2CV%2CV%29"
     title="intersectionMerge[K, V](tree1, tree2: BBTree[K, V]; merge: proc (k: K; v1, v2: V): V): BBTree[
     K, V]"><wbr />intersection<wbr />Merge<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
-  <li><a class="reference" href="#isSubset%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
-    title="isSubset[K, V](tree1, tree2: BBTree[K, V]): bool"><wbr />is<wbr />Subset<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#isSubset%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
+    title="isSubset[K, U, V](tree1: BBTree[K, U]; tree2: BBTree[K, V]): bool"><wbr />is<wbr />Subset<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#disjoint%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
     title="disjoint[K, V](tree1, tree2: BBTree[K, V]): bool"><wbr />disjoint<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
-  <li><a class="reference" href="#isProperSubset%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
-    title="isProperSubset[K, V](tree1, tree2: BBTree[K, V]): bool"><wbr />is<wbr />Proper<wbr />Subset<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#isProperSubset%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
+    title="isProperSubset[K, U, V](tree1: BBTree[K, U]; tree2: BBTree[K, V]): bool"><wbr />is<wbr />Proper<wbr />Subset<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#%2B%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
     title="`+`[K, V](s1, s2: BBTree[K, V]): BBTree[K, V]"><wbr />`+`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#%2A%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
@@ -1307,10 +1311,10 @@ function main() {
     title="`-`[K, V](s1, s2: BBTree[K, V]): BBTree[K, V]"><wbr />`-`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#-%2B-%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
     title="`-+-`[K, V](s1, s2: BBTree[K, V]): BBTree[K, V]"><wbr />`-+-`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
-  <li><a class="reference" href="#%3C%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
-    title="`&lt;`[K, V](s1, s2: BBTree[K, V]): bool"><wbr />`&lt;`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
-  <li><a class="reference" href="#%3C%3D%2CBBTree%5BK%2CV%5D%2CBBTree%5BK%2CV%5D"
-    title="`&lt;=`[K, V](s1, s2: BBTree[K, V]): bool"><wbr />`&lt;=`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#%3C%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
+    title="`&lt;`[K, U, V](s1: BBTree[K, U]; s2: BBTree[K, V]): bool"><wbr />`&lt;`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
+  <li><a class="reference" href="#%3C%3D%2CBBTree%5BK%2CU%5D%2CBBTree%5BK%2CV%5D"
+    title="`&lt;=`[K, U, V](s1: BBTree[K, U]; s2: BBTree[K, V]): bool"><wbr />`&lt;=`<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#countKeys%2CBBTree%5BK%2CV%5D"
     title="countKeys[K, V](root: BBTree[K, V]): int"><wbr />count<wbr />Keys<span class="attachedType" style="visibility:hidden">BBTree</span></a></li>
   <li><a class="reference" href="#isBalanced%2CBBTree%5BK%2CV%5D"
@@ -1356,7 +1360,7 @@ function main() {
   <span class="Identifier">val</span><span class="Other">:</span> <span class="Identifier">V</span>
 </pre></dt>
 <dd>
-
+<cite>BBTree</cite> is an opaque immutable type.
 
 </dd>
 
@@ -1436,6 +1440,18 @@ Delete the maximum element from tree <cite>root</cite>. O(log N)
 Retrieves the 0-based index of <cite>key</cite> in the tree <cite>root</cite> iff <cite>key</cite> is in the tree. Otherwise, <cite>default</cite> is returned. O(log N)
 
 </dd>
+<a id="fold,BBTree[K,V],proc(K,V,T),T"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">fold</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">,</span> <span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">root</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">f</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">key</span><span class="Other">:</span> <span class="Identifier">K</span><span class="Other">;</span> <span class="Identifier">val</span><span class="Other">:</span> <span class="Identifier">V</span><span class="Other">;</span> <span class="Identifier">base</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">;</span> <span class="Identifier">base</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span></pre></dt>
+<dd>
+Applies the proc <cite>f</cite> to each value of tree <cite>root</cite> in reverse order (right to left). Uses the <cite>base</cite> value for the first rightmost operand. So, for example, to construct a concatenated string of stringified tree values, you could use<pre class="listing"><span class="Identifier">fold</span><span class="Punctuation">(</span><span class="Identifier">root</span><span class="Punctuation">,</span> <span class="Keyword">proc</span> <span class="Punctuation">(</span><span class="Identifier">k</span><span class="Punctuation">:</span> <span class="Identifier">int</span><span class="Punctuation">,</span> <span class="Identifier">v</span><span class="Punctuation">:</span> <span class="Identifier">int</span><span class="Punctuation">,</span> <span class="Identifier">b</span><span class="Punctuation">:</span> <span class="Identifier">string</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">string</span> <span class="Operator">=</span> <span class="Keyword">discard</span> <span class="Identifier">k</span><span class="Punctuation">;</span> <span class="Operator">$</span><span class="Identifier">v</span> <span class="Operator">&amp;</span> <span class="StringLit">&quot;;&quot;</span> <span class="Operator">&amp;</span>  <span class="Identifier">b</span><span class="Punctuation">,</span> <span class="StringLit">&quot;&quot;</span><span class="Punctuation">)</span></pre>
+
+</dd>
+<a id="map,BBTree[K,V],proc(K,V)"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">map</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">,</span> <span class="Identifier">T</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">root</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">f</span><span class="Other">:</span> <span class="Keyword">proc</span> <span class="Other">(</span><span class="Identifier">key</span><span class="Other">:</span> <span class="Identifier">K</span><span class="Other">;</span> <span class="Identifier">val</span><span class="Other">:</span> <span class="Identifier">V</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">T</span><span class="Other">)</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">T</span><span class="Other">]</span></pre></dt>
+<dd>
+Returns a new tree with the keys of tree <cite>root</cite> and values that are the result of applying <cite>f</cite> to each key and corresponding value. So, for example, to construct a tree with values replaced by concatenated string of key,value pairs, you could use<pre class="listing"><span class="Identifier">map</span><span class="Punctuation">(</span><span class="Identifier">root</span><span class="Punctuation">,</span> <span class="Keyword">proc</span> <span class="Punctuation">(</span><span class="Identifier">k</span><span class="Punctuation">:</span> <span class="Identifier">int</span><span class="Punctuation">,</span> <span class="Identifier">v</span><span class="Punctuation">:</span> <span class="Identifier">int</span><span class="Punctuation">)</span><span class="Punctuation">:</span> <span class="Identifier">string</span> <span class="Operator">=</span> <span class="Operator">$</span><span class="Identifier">k</span> <span class="Operator">&amp;</span> <span class="StringLit">&quot;:&quot;</span> <span class="Operator">&amp;</span> <span class="Operator">$</span><span class="Identifier">v</span><span class="Punctuation">)</span></pre>
+
+</dd>
 <a id="union,BBTree[K,V],BBTree[K,V]"></a>
 <dt><pre><span class="Keyword">func</span> <span class="Identifier">union</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">tree1</span><span class="Other">,</span> <span class="Identifier">tree2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span></pre></dt>
 <dd>
@@ -1480,8 +1496,8 @@ Returns the set intersection of <cite>tree1</cite> and <cite>tree2</cite>. In ot
 Returns the set intersection of <cite>tree1</cite> and <cite>tree2</cite>. In other words, returns the keys that are in both trees. When viewed as maps, returns the key,value pairs for keys that appear in both trees; the value for each key is the result of the supplied <cite>merge</cite> function, which is passed the common key, and the values from <cite>tree1</cite> and <cite>tree2</cite> respectively.  O(M + N)
 
 </dd>
-<a id="isSubset,BBTree[K,V],BBTree[K,V]"></a>
-<dt><pre><span class="Keyword">func</span> <span class="Identifier">isSubset</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">tree1</span><span class="Other">,</span> <span class="Identifier">tree2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span></pre></dt>
+<a id="isSubset,BBTree[K,U],BBTree[K,V]"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">isSubset</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">tree1</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">tree2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span></pre></dt>
 <dd>
 Returns true iff the keys in <cite>tree1</cite> form a subset of the keys in <cite>tree2</cite>. In other words, if all the keys that are in <cite>tree1</cite> are also in <cite>tree2</cite>. O(N) where N is <cite>len(tree1)</cite> Use <cite>isProperSubset</cite> instead to determins that there are keys in <cite>tree2</cite> that are not in <cite>tree1</cite>.
 
@@ -1492,8 +1508,8 @@ Returns true iff the keys in <cite>tree1</cite> form a subset of the keys in <ci
 Returns true iff <cite>tree1</cite> and <cite>tree2</cite> have no keys in common. O(N) where N is <cite>len(tree1)</cite>
 
 </dd>
-<a id="isProperSubset,BBTree[K,V],BBTree[K,V]"></a>
-<dt><pre><span class="Keyword">func</span> <span class="Identifier">isProperSubset</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">tree1</span><span class="Other">,</span> <span class="Identifier">tree2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span></pre></dt>
+<a id="isProperSubset,BBTree[K,U],BBTree[K,V]"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">isProperSubset</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">tree1</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">tree2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span></pre></dt>
 <dd>
 Returns true iff the keys in <cite>tree1</cite> form a proper subset of the keys in <cite>tree2</cite>. In other words, if all the keys that are in <cite>tree1</cite> are also in <cite>tree2</cite>, but there are keys in <cite>tree2</cite> that are not in <cite>tree1</cite>.  O(N) where N is <cite>len(tree1)</cite>
 
@@ -1501,39 +1517,39 @@ Returns true iff the keys in <cite>tree1</cite> form a proper subset of the keys
 <a id="+,BBTree[K,V],BBTree[K,V]"></a>
 <dt><pre><span class="Keyword">func</span> <span class="Identifier">`+`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">,</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
-Alias for <a class="reference external" href="#union">union(s1, s2)</a>.
+Alias for <a class="reference external" href="#union,BBTree[K,V],BBTree[K,V]">union(s1, s2)</a>.
 
 </dd>
 <a id="*,BBTree[K,V],BBTree[K,V]"></a>
 <dt><pre><span class="Keyword">func</span> <span class="Identifier">`*`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">,</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
-Alias for <a class="reference external" href="#intersection">intersection(s1, s2)</a>.
+Alias for <a class="reference external" href="#intersection,BBTree[K,V],BBTree[K,V]">intersection(s1, s2)</a>.
 
 </dd>
 <a id="-,BBTree[K,V],BBTree[K,V]"></a>
 <dt><pre><span class="Keyword">func</span> <span class="Identifier">`-`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">,</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
-Alias for <a class="reference external" href="#difference">difference(s1, s2)</a>.
+Alias for <a class="reference external" href="#difference,BBTree[K,V],BBTree[K,V]">difference(s1, s2)</a>.
 
 </dd>
 <a id="-+-,BBTree[K,V],BBTree[K,V]"></a>
 <dt><pre><span class="Keyword">func</span> <span class="Identifier">`-+-`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">,</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
-Alias for <a class="reference external" href="#symmetricDifference">symmetricDifference(s1, s2)</a>.
+Alias for <a class="reference external" href="#symmetricDifference,BBTree[K,V],BBTree[K,V]">symmetricDifference(s1, s2)</a>.
 
 </dd>
-<a id="<,BBTree[K,V],BBTree[K,V]"></a>
-<dt><pre><span class="Keyword">func</span> <span class="Identifier">`&lt;`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">,</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
+<a id="<,BBTree[K,U],BBTree[K,V]"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">`&lt;`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
-<p>Alias for <a class="reference external" href="#isProperSubset">isProperSubset(s1, s2)</a>. Returns true if the keys in <cite>s1</cite> form a strict or proper subset of the keys in <cite>s2</cite>.</p>
+<p>Alias for <a class="reference external" href="#isProperSubset,BBTree[K,U],BBTree[K,V]">isProperSubset(s1, s2)</a>. Returns true if the keys in <cite>s1</cite> form a strict or proper subset of the keys in <cite>s2</cite>.</p>
 <p>A strict or proper subset <cite>s1</cite> has all of its keys in <cite>s2</cite> but <cite>s2</cite> has more elements than <cite>s1</cite>.</p>
 
 
 </dd>
-<a id="<=,BBTree[K,V],BBTree[K,V]"></a>
-<dt><pre><span class="Keyword">func</span> <span class="Identifier">`&lt;=`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">,</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
+<a id="<=,BBTree[K,U],BBTree[K,V]"></a>
+<dt><pre><span class="Keyword">func</span> <span class="Identifier">`&lt;=`</span><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">(</span><span class="Identifier">s1</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">U</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">s2</span><span class="Other">:</span> <a href="bbtree.html#BBTree"><span class="Identifier">BBTree</span></a><span class="Other">[</span><span class="Identifier">K</span><span class="Other">,</span> <span class="Identifier">V</span><span class="Other">]</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">bool</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">inline</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
-<p>Alias for <a class="reference external" href="#isSubset">isSubset(s1, s2)</a>. Returns true if <cite>s1</cite> is subset of <cite>s2</cite>.</p>
+<p>Alias for <a class="reference external" href="#isSubset,BBTree[K,U],BBTree[K,V]">isSubset(s1, s2)</a>. Returns true if <cite>s1</cite> is subset of <cite>s2</cite>.</p>
 <p>A subset <cite>s1</cite> has all of its members in <cite>ts2</cite> and <cite>s2</cite> doesn't necessarily have more members than <cite>s1</cite>. That is, <cite>s1</cite> can be equal to <cite>s2</cite>.</p>
 
 
@@ -1577,7 +1593,7 @@ Reverse inorder traversal of the tree at <cite>root</cite>, i.e., from largest t
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small>Made with Nim. Generated: 2018-12-31 01:52:36 UTC</small>
+        <small>Made with Nim. Generated: 2018-12-31 20:25:58 UTC</small>
       </div>
     </div>
   </div>

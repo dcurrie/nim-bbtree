@@ -1,5 +1,5 @@
 
-import unittest, random
+import unittest, random, strutils
 import bbtree
 
 func isOrdered[K,V](root: BBTree[K,V], min: K): bool =
@@ -176,6 +176,59 @@ suite "test int,int bbtree.nim":
         root = add(root, 3, -33)
         check(len(root) == 9)
         check(get(root,3,99) == -33)
+
+suite "test opacity bbtree.nim":
+
+    var root : BBTree[int,string] = nil
+
+    root = add(root, 1, "one")
+
+    test "opacity":
+        # manually checked, generate compile errors as expected...
+        # check(root.left == false)
+        # check(root.right == false)
+        # check(root.size == false)
+        # check(root.key == false)
+        # check(root.val == false)
+        discard
+
+
+suite "test map and fold bbtree.nim":
+
+    var root : BBTree[int,int] = nil
+    #let null = root 
+
+    for i in 1..<20:
+        root = add(root, i, -i)
+
+    test "fold to string":
+        var d = fold(root, 
+                    proc (k: int, v: int, b: string): string = discard k; $v & ";" & b,
+                    "")
+        # echo d
+        let s = split(d, {';'})
+        var i = 0
+        for k,v in inorder(root):
+            check($v == s[i])
+            i += 1
+            discard k
+
+    test "map to string":
+        let t2 = map(root,
+                    proc (k: int, v: int): string = $k & ":" & $v)
+        check(t2.len == root.len)
+        # check(t2 == root) # set == just checks keys, but typecheck fails
+        check(t2 <= root)
+        check(root <= t2)
+        for k,v in revorder(t2):
+            check(root.contains(k))
+            check(v.is(string))
+            let s = split(v, {':'})
+            check($k == s[0])
+            check($(-k) == s[1])
+        for k,v in revorder(root):
+            check(t2.contains(k))
+            check(v.is(int))
 
 
 
