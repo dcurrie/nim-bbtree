@@ -381,6 +381,7 @@ suite "random stress test of bbtree.nim":
     test "timed random tree iterations":
         var stop = false
         var start = cpuTime()
+        write(stderr, "        ")
         init_random_tree()
         for i in 1..BB_ITERATIONS:
             if stop: break
@@ -410,11 +411,11 @@ suite "random stress test of bbtree.nim":
                 check(isOrdered(tree, ""))
                 check(isBalanced(tree))
         let finish = cpuTime()
-        #echo "CPU time [s] ", finish - start, " for ", BB_ITERATIONS, " ops, averaging ", (finish - start) / BB_ITERATIONS
-        write(stderr, "\nCPU time [s] ", finish - start,
-                      " for ", BB_ITERATIONS, " ops, averaging ",
-                       (finish - start) / toFloat(BB_ITERATIONS), " s per op\n")
-        write(stderr, "random q: ", q_ins, " inserts, ", q_del, " deletes, ", qintree, " qintree, ", q_ins - q_del, " final size\n")
+        write(stderr, "\n        CPU time ", finish - start,
+                      " s for ", BB_ITERATIONS, " loops, averaging ",
+                       (finish - start) / toFloat(BB_ITERATIONS), " s per loop\n")
+        write(stderr, "        random q: ", q_ins, " inserts, ", q_del, " deletes, ", qintree, " qintree, ",
+                         q_ins - q_del, " final size\n")
 
 
 #[
