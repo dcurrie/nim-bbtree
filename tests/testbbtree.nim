@@ -1,5 +1,5 @@
 
-import unittest, random, strutils
+import unittest, random, strutils, times
 import bbtree
 
 func isOrdered[K,V](root: BBTree[K,V], min: K): bool =
@@ -301,7 +301,125 @@ suite "test set funcs of bbtree.nim":
         check((bb * aa) =?= (aa * bb))
         check(disjoint(bb * aa, aa -+- bb))
 
+suite "random stress test of bbtree.nim":
 
+    const
+        STRESS_TEST_N {.intdefine.} : int = 2000
+        BB_ITERATIONS {.intdefine.} : int = 2000
+
+        MARKER = low(int64)
+        chs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    var
+        tree : BBTree[string, int64]
+        intree : array[0..STRESS_TEST_N-1, int64]
+        qintree = 0
+        q_ins = 0
+        q_del = 0
+        rand1 : Rand
+
+    proc init_random_tree() =
+        rand1 = initRand(0x987654321)
+        for i in 0..<STRESS_TEST_N:
+            intree[i] = MARKER
+        qintree = 0;
+        q_ins = 0
+        q_del = 0
+
+    proc make_random_key_val(k: int64) : (string, int64) =
+        var randk = initRand(k)
+        let size = rand(randk, 16) + 8
+        var key = repeat(' ', size)
+        for i in 0..<size:
+            key[i] = chs[rand(randk,51)]
+        result = (key, -k)
+
+    proc tstput(k: int64) =
+        let (key,val) = make_random_key_val(k)
+        tree = tree.add(key, val)
+
+    proc tstget(k: int64) : int64 =
+        let (key,val) = make_random_key_val(k)
+        discard val
+        result = tree.get(key, 1)
+
+    proc tstrem(k: int64) =
+        let (key,val) = make_random_key_val(k)
+        discard val
+        tree = tree.del(key)
+
+    proc do_random_tree_op()  =
+        let x = rand(rand1, STRESS_TEST_N-1)
+        let n = intree[x]
+        if n == MARKER:
+            # insert
+            let k = rand(rand1, high(int64))
+            tstput(k)
+            intree[x] = k
+            qintree += 1
+            q_ins += 1
+        else:
+            # delete
+            tstrem(n)
+            intree[x] = MARKER
+            qintree -= 1
+            q_del += 1
+
+    proc find_and_wipe_duplicate() : int =
+        result = 0
+        for i in 0..<STRESS_TEST_N:
+            let n = intree[i]
+            if n != MARKER:
+                for j in (i+1)..<STRESS_TEST_N:
+                    if n == intree[j]:
+                        # duplicate
+                        intree[j] = MARKER
+                        qintree -= 1
+                        q_ins -= 1
+                        return j # > 0
+
+    test "timed random tree iterations":
+        var stop = false
+        var start = cpuTime()
+        init_random_tree()
+        for i in 1..BB_ITERATIONS:
+            if stop: break
+            do_random_tree_op()
+            for j in 0..<STRESS_TEST_N:
+                let n = intree[j]
+                if n != MARKER:
+                    let v = tstget(n)
+                    check(v <= 0)
+                    check(v == -n)
+                    if v == 1:
+                        stop = true
+                        break
+            let sz = tree.len
+            if sz != q_ins - q_del:
+                let dup = find_and_wipe_duplicate()
+                if dup != 0:
+                    # whew!
+                    echo "dup!"
+            check(sz == (q_ins - q_del))
+            if stop or (sz != (q_ins - q_del)):
+                #fprintf(stderr, "random err: %u nodes, %ld final size\n", sz, q_ins - q_del);
+                check(not stop)
+                stop = true
+            if i mod 1024 == 0:
+                write(stderr, ".")
+                check(isOrdered(tree, ""))
+                check(isBalanced(tree))
+        let finish = cpuTime()
+        #echo "CPU time [s] ", finish - start, " for ", BB_ITERATIONS, " ops, averaging ", (finish - start) / BB_ITERATIONS
+        write(stderr, "\nCPU time [s] ", finish - start,
+                      " for ", BB_ITERATIONS, " ops, averaging ",
+                       (finish - start) / toFloat(BB_ITERATIONS), " s per op\n")
+        write(stderr, "random q: ", q_ins, " inserts, ", q_del, " deletes, ", qintree, " qintree, ", q_ins - q_del, " final size\n")
+
+
+#[
+
+]#
 
 #    test "out of bounds error is thrown on bad access":
 #        let v = @[1, 2, 3]  # you can do initialization here
