@@ -147,9 +147,9 @@ suite "test int,int bbtree.nim":
         check(len(root) == 40)
         res = get(root, 44, -999)
         check(res == -999)
-        check(delMin(null) == nil)
-        check(delMax(null) == nil)
-        check(del(null, 19) == nil)
+        check(delMin(null).isNil)
+        check(delMax(null).isNil)
+        check(del(null, 19).isNil)
 
     test "delete random items, check, check ordered, balanced, and length":
         var n = len(root)

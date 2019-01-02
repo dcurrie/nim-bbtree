@@ -179,7 +179,7 @@ func get*[K,V](root: BBTree[K,V], key: K, default: V): V =
     ## Otherwise, `default` is returned. O(log N)
     result = default
     var node = root
-    while node != nil:
+    while (not node.isNil):
         let dif = cmp(key, node.key)
         if dif < 0:
             node = node.left
@@ -203,7 +203,7 @@ func getNth*[K,V](root: BBTree[K,V], index: int, default: (K, V)): (K, V) =
             uindex = treesize + index # when negative, reverse index from end rather than inorder
         else:
             uindex = index # all set
-        while node != nil:
+        while (not node.isNil):
             let leftsize = nodeSize(node.left)
             if uindex < leftsize:
                 node = node.left
@@ -222,7 +222,7 @@ func getMin*[K,V](root: BBTree[K,V], default: (K, V)): (K, V) =
     if node.isNil:
         result = default
     else:
-        while node.left != nil:
+        while (not node.left.isNil):
             node = node.left;
         result = (node.key, node.val)
 
@@ -233,7 +233,7 @@ func getMax*[K,V](root: BBTree[K,V], default: (K, V)): (K, V) =
     if node.isNil:
         result = default
     else:
-        while node.right != nil:
+        while (not node.right.isNil):
             node = node.right;
         result = (node.key, node.val)
 
@@ -388,7 +388,7 @@ func rank*[K,V](root: BBTree[K,V], key: K, default: int): int =
     result = default
     var n = 0
     var node = root
-    while node != nil:
+    while (not node.isNil):
         let dif = cmp(key, node.key);
         if (dif < 0):
             node = node.left
@@ -421,8 +421,8 @@ iterator inorder*[K,V](root: BBTree[K,V]): (K,V) =
     # Since recursive iterators are not yet implemented, this uses an explicit stack 
     var stack: seq[BBTree[K,V]] = @[]
     var curr = root
-    while curr != nil or stack.len > 0:
-        while curr != nil:
+    while (not curr.isNil) or stack.len > 0:
+        while (not curr.isNil):
             add(stack, curr) # push node before going left
             curr = curr.left
         # at the leftmost node; curr is nil
@@ -435,8 +435,8 @@ iterator revorder*[K,V](root: BBTree[K,V]): (K,V) =
     # Since recursive iterators are not yet implemented, this uses an explicit stack
     var stack: seq[BBTree[K,V]] = @[]
     var curr = root
-    while curr != nil or stack.len > 0:
-        while curr != nil:
+    while (not curr.isNil) or stack.len > 0:
+        while (not curr.isNil):
             add(stack, curr) # push node before going right
             curr = curr.right
         # at the rightmost node; curr is nil
@@ -447,7 +447,8 @@ iterator revorder*[K,V](root: BBTree[K,V]): (K,V) =
 #[ **************************** fold & map ********************************
 ]#
 
-# this is a proc to allow f to modify base of type T
+# This could be a proc to allow f to modify base of type T, but trying that led to typing
+# trouble that I'd prefer to avoid for now.
 #
 func fold*[K,V,T](root: BBTree[K,V], f: proc (key: K, val: V, base: T): T, base: T): T =
     ## Applies the proc `f` to each value of tree `root` in reverse order (right to left).
@@ -461,8 +462,8 @@ func fold*[K,V,T](root: BBTree[K,V], f: proc (key: K, val: V, base: T): T, base:
     var stack: seq[BBTree[K,V]] = @[]
     var curr = root
     result = base
-    while curr != nil or stack.len > 0:
-        while curr != nil:
+    while (not curr.isNil) or stack.len > 0:
+        while (not curr.isNil):
             add(stack, curr) # push node before going right
             curr = curr.right
         # at the rightmost node; curr is nil
@@ -609,7 +610,7 @@ func contains*[K,V](root: BBTree[K,V], key: K): bool =
     ## otherwise `false`. O(log N)
     result = false
     var node = root
-    while node != nil:
+    while (not node.isNil):
         let dif = cmp(key, node.key)
         if dif < 0:
             node = node.left
@@ -681,7 +682,7 @@ func disjoint*[K,V](tree1, tree2: BBTree[K,V]): bool =
     ## Returns true iff `tree1` and `tree2` have no keys in common. O(N) where N is
     ## `len(tree1)`
     result = true # default
-    if tree1 != nil and tree2 != nil:
+    if (not tree1.isNil) and (not tree2.isNil):
         let dif = cmp(tree1.key, tree2.key)
         if dif < 0:
             if not disjoint(tree1.left, tree2.left): return false
@@ -740,12 +741,11 @@ func `<=`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
 
 #[
 #  `==` seems like an extreme assertion when values are not being considered...
-#  but this would be consistent with Nim's set API.
-#  Unfortunately it does not type check despite being identical to `<=`
-
+#  but this would be consistent with Nim's set API. Punt for now; use =?= instead.
+#
 func `==`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
     ## Returns true if both `s1` and `s2` have the same keys and set size.
-    result = isSubset(s1, s2) and len(s1) == len(s2)
+    result = setEqual(s1, s2)
 ]#
 func `=?=`*[K,U,V](s1: BBTree[K,U], s2: BBTree[K,V]): bool {.inline.} =
     ## Alias for `setEqual(s1, s2) <#setEqual,BBTree[K,U],BBTree[K,V]>`_.
@@ -774,7 +774,7 @@ func countKeys*[K,V](root: BBTree[K,V]): int =
     ## Used for unit testing only; normally use `len` to get the number of keys.
     var node = root
     result = 0
-    while node != nil:
+    while (not node.isNil):
         result += countKeys(node.left)
         result += 1
         node = node.right
