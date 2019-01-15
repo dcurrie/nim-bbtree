@@ -1,0 +1,90 @@
+
+
+## TODO
+
+test unionMerge and intersectionMerge
+
+## Consider adding
+
+addMerge
+
+incl alias for add
+excl alias for del
+card alias for len
+
+## Consider adding tree/map-like equivalents to:
+
+proc filter[T](s: openArray[T]; pred: proc (x: T): bool {...}): seq[T] {...}
+Returns a new sequence with all the items that fulfilled the predicate.
+
+proc all[T](s: openArray[T]; pred: proc (x: T): bool {...}): bool
+Iterates through a container and checks if every item fulfills the predicate.
+
+proc any[T](s: openArray[T]; pred: proc (x: T): bool {...}): bool
+Iterates through a container and checks if some item fulfills the predicate.
+
+proc zip[S, T](s1: openArray[S]; s2: openArray[T]): seq[tuple[a: S, b: T]]
+Returns a new sequence with a combination of the two input containers.
+For convenience you can access the returned tuples through the named fields a and b. 
+If one container is shorter, the remaining items in the longer container are discarded.
+
+## Consider subclassing BBTree as BBSet with no Val field
+
+## Determine if there is a way to use object variants or subclasses to reduce memory consumption
+without making the code a lot more complex; e.g., BBTreeKind = enum One, TwoL, TwoR, Node, and 
+cased out funcs for size, left, right, key, and val
+
+## Note
+
+From sequtils, 
+template toSeq(iter: untyped): untyped
+Transforms any iterator into a sequence.
+
+## Done
+
+These are automatic:
+`in` alias for contains
+`notin` alias for not contains
+
+proc map[T, S](s: openArray[T]; op: proc (x: T): S {...}): seq[S] {...}
+Returns a new sequence with the results of op applied to every item in the container s.
+Since the input is not modified you can use this version of map to transform the type 
+of the elements in the input container.
+
+fold of some kind, at least foldr though the sequtils version doesn't tahe a base value
+
+## Testing
+
+[Suite] test int,int bbtree.nim
+  [OK] empty tree is ordered, balanced, has length zero
+  [OK] one entry tree is ordered, balanced, has length one
+  [OK] one entry tree lookup works
+  [OK] add items in increasing key order, check ordered, balanced, has length 21
+  [OK] add items in decreasing key order, check ordered, balanced, has length 44
+  [OK] check that some items are in the length 44 tree
+  [OK] check succ and pred functions in the length 44 tree
+  [OK] delete some items, check, check ordered, balanced, and length
+  [OK] delete random items, check, check ordered, balanced, and length
+  [OK] using add to replace values
+
+[Suite] test opacity bbtree.nim
+  [OK] opacity
+
+[Suite] test map and fold bbtree.nim
+  [OK] fold to string
+  [OK] map to string
+
+[Suite] test set funcs of bbtree.nim
+  [OK] toSet
+  [OK] Nim compat
+  [OK] Pairs as keys
+  [OK] ints as set keys
+
+[Suite] random stress test of bbtree.nim
+        ........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+        CPU time 13063.857357794 s for 500000 loops, averaging 0.026127714715588 s per loop
+        random q: 254981 inserts, 245019 deletes, 9962 qintree, 9962 final size
+  [OK] timed random tree iterations
+nim-bbtree e$ 
+
+
