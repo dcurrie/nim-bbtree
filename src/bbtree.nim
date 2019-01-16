@@ -48,7 +48,7 @@ type
         left:  BBTree[K,V]      # left subtree; may be nil
         right: BBTree[K,V]      # right subtree; may be nil
         size:  int              # the size of the (sub-)tree rooted in this node
-        key:   K                # the search key; must suppprt the generic ``cmp`` proc
+        key:   K                # the search key; must support the generic ``cmp`` proc
         val:   V                # the data value associated with the key, and stored in a node
 
 const                           # balance criteria

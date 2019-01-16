@@ -6,10 +6,9 @@ func isOrdered[K,V](root: BBTree[K,V], min: K): bool =
     var last = min
     for k,v in inorder(root):
         discard v
-        if last == min:
+        if last == min or cmp(last, k) < 0:
+            #ok
             last = k
-        elif cmp(last, k) < 0:
-            discard # ok
         else:
             return false
     return true
