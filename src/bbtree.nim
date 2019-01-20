@@ -82,10 +82,10 @@ func right[K,V](n: BBLeaf[K,V]):  BBTree[K,V] = return nil
 type
     BBTree*[K,V] = ref object of RootObj # BBTree is a generic type with keys and values of types K, V
         ## `BBTree` is an opaque immutable type.
-    BBLeaf[K,V] = ref object of BBTree
+    BBLeaf[K,V] = ref object of BBTree[K,V]
         vkey:   K               # the search key; must support the generic ``cmp`` proc
         vval:   V               # the data value associated with the key, and stored in a node
-    BBNode[K,V] = ref object of BBTree
+    BBNode[K,V] = ref object of BBTree[K,V]
         vkey:   K               # the search key; must support the generic ``cmp`` proc
         vval:   V               # the data value associated with the key, and stored in a node
         vleft:  BBTree[K,V]     # left subtree; may be nil
@@ -153,52 +153,52 @@ balance left key right
     | otherwise = node left key right
 ]#
 
-func singleL[K,V](left: BBTree[K,V], key: K, value: V, right: BBTree[K,V]): BBTree[K,V] =
-    result = newNode(newNode(left, key, value, right.left),
-                        right.key, 
-                        right.val, 
-                        right.right)
+func singleL[K,V](aleft: BBTree[K,V], akey: K, avalue: V, aright: BBTree[K,V]): BBTree[K,V] =
+    result = newNode(newNode(aleft, akey, avalue, aright.left),
+                        aright.key, 
+                        aright.val, 
+                        aright.right)
 
-func doubleL[K,V](left: BBTree[K,V], key: K, value: V, right: BBTree[K,V]): BBTree[K,V] =
-    let rl = right.left
-    result = newNode(newNode(left, key, value, rl.left),
+func doubleL[K,V](aleft: BBTree[K,V], akey: K, avalue: V, aright: BBTree[K,V]): BBTree[K,V] =
+    let rl = aright.left
+    result = newNode(newNode(aleft, akey, avalue, rl.left),
                      rl.key, 
                      rl.val, 
-                     newNode(rl.right, right.key, right.val, right.right))
+                     newNode(rl.right, aright.key, aright.val, aright.right))
 
 
-func singleR[K,V](left: BBTree[K,V], key: K, value: V, right: BBTree[K,V]): BBTree[K,V] =
-    result = newNode(left.left,
-                     left.key,
-                     left.val,
-                     newNode(left.right, key, value, right))
+func singleR[K,V](aleft: BBTree[K,V], akey: K, avalue: V, aright: BBTree[K,V]): BBTree[K,V] =
+    result = newNode(aleft.left,
+                     aleft.key,
+                     aleft.val,
+                     newNode(aleft.right, akey, avalue, aright))
 
-func doubleR[K,V](left: BBTree[K,V], key: K, value: V, right: BBTree[K,V]): BBTree[K,V] =
-    let lr = left.right
-    result = newNode(newNode(left.left, left.key, left.val, lr.left),
+func doubleR[K,V](aleft: BBTree[K,V], akey: K, avalue: V, aright: BBTree[K,V]): BBTree[K,V] =
+    let lr = aleft.right
+    result = newNode(newNode(aleft.left, aleft.key, aleft.val, lr.left),
                      lr.key,
                      lr.val,
-                     newNode(lr.right, key, value, right))
+                     newNode(lr.right, akey, avalue, aright))
 
-func balance[K,V](left: BBTree[K,V], key: K, value: V, right: BBTree[K,V]): BBTree[K,V] =
+func balance[K,V](aleft: BBTree[K,V], key: K, value: V, aright: BBTree[K,V]): BBTree[K,V] =
     let
-        sl = nodeSize(left)
-        sr = nodeSize(right)
+        sl = nodeSize(aleft)
+        sr = nodeSize(aright)
 
     if ((sl + sr) <= 1):
-        result = newNode(left, key, value, right)
+        result = newNode(aleft, key, value, aright)
     elif (sr > (omega * sl)):
-        if (nodeSize(right.left) < (alpha * nodeSize(right.right))):
-            result = singleL(left, key, value, right)
+        if (nodeSize(aright.left) < (alpha * nodeSize(aright.right))):
+            result = singleL(aleft, key, value, aright)
         else:
-            result = doubleL(left, key, value, right)
+            result = doubleL(aleft, key, value, aright)
     elif (sl > (omega * sr)):
-        if (nodeSize(left.right) < (alpha * nodeSize(left.left))):
-            result = singleR(left, key, value, right)
+        if (nodeSize(aleft.right) < (alpha * nodeSize(aleft.left))):
+            result = singleR(aleft, key, value, aright)
         else:
-            result = doubleR(left, key, value, right)
+            result = doubleR(aleft, key, value, aright)
     else:
-        result = newNode(left, key, value, right)
+        result = newNode(aleft, key, value, aright  )
 
 #[ **************************** insert ********************************
 #
@@ -233,13 +233,13 @@ func add*[K,V](root: BBTree[K,V], keyy: K, value: V): BBTree[K,V] =
 
 # default is returned is key is not in tree
 #
-func get*[K,V](root: BBTree[K,V], key: K, default: V): V =
+func get*[K,V](root: BBTree[K,V], akey: K, default: V): V =
     ## Retrieves the value for `key` in the tree `root` iff `key` is in the tree. 
     ## Otherwise, `default` is returned. O(log N)
     result = default
     var node = root
     while (not node.isNil):
-        let dif = cmp(key, node.key)
+        let dif = cmp(akey, node.key)
         if dif < 0:
             node = node.left
         elif dif > 0:
@@ -302,7 +302,7 @@ func getKV[K,V](node: BBTree[K,V], default: (K, V)): (K, V) {.inline.} =
     else:
         result = (node.key, node.val)
 
-func getNext*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
+func getNext*[K,V](root: BBTree[K,V], akey: K, default: (K,V)): (K,V) =
     ## Returns the key,value pair with smallest key > `key`.
     ## It is almost inorder successor, but it also works when `key` is not present.
     ## If there is no such successor key in the tree, `default` is returned. O(log N)
@@ -314,7 +314,7 @@ func getNext*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
             result = getKV(last_left_from, default) # key not found
             done = true
         else:
-            let dif = cmp(key, node.key)
+            let dif = cmp(akey, node.key)
             if (dif < 0):
                 last_left_from = node
                 node = node.left
@@ -328,7 +328,7 @@ func getNext*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
                     result = getMin(node.right, default)
                 done = true
 
-func getPrev*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
+func getPrev*[K,V](root: BBTree[K,V], akey: K, default: (K,V)): (K,V) =
     ## Returns the key,value pair with largest key < `key`.
     ## It is almost inorder predecessor, but it also works when `key` is not present.
     ## If there is no such predecessor key in the tree, `default` is returned. O(log N)
@@ -340,7 +340,7 @@ func getPrev*[K,V](root: BBTree[K,V], key: K, default: (K,V)): (K,V) =
             result = getKV(last_right_from, default) # key not found
             done = true
         else:
-            let dif = cmp(key, node.key)
+            let dif = cmp(akey, node.key)
             if (dif < 0):
                 node = node.left
             elif (dif > 0):
@@ -404,17 +404,17 @@ func glue[K,V](left: BBTree[K,V], right: BBTree[K,V]): BBTree[K,V] =
         let (mink, minv, rightp) = extractMin(right)
         result = newNode(left, mink, minv, rightp)
 
-func del*[K,V](root: BBTree[K,V], key: K): BBTree[K,V] =
+func del*[K,V](root: BBTree[K,V], akey: K): BBTree[K,V] =
     ## Deletes `key` from tree `root`. Does nothing if the key does not exist.
     ## O(log N)
     if root.isNil:
         result = root
     else:
-        let dif = cmp(key, root.key);
+        let dif = cmp(akey, root.key);
         if (dif < 0):
-            result = balance(del(root.left, key), root.key, root.val, root.right)
+            result = balance(del(root.left, akey), root.key, root.val, root.right)
         elif (dif > 0):
-            result = balance(root.left, root.key, root.val, del(root.right, key))
+            result = balance(root.left, root.key, root.val, del(root.right, akey))
         else: # key and root.key are eq
             result = glue(root.left, root.right)
 
@@ -441,14 +441,14 @@ func delMax*[K,V](root: BBTree[K,V]): BBTree[K,V] =
 #[ ****************************** rank ***********************************
 ]#
 
-func rank*[K,V](root: BBTree[K,V], key: K, default: int): int =
+func rank*[K,V](root: BBTree[K,V], akey: K, default: int): int =
     ## Retrieves the 0-based index of `key` in the tree `root` iff `key` is in the tree. 
     ## Otherwise, `default` is returned. O(log N)
     result = default
     var n = 0
     var node = root
     while (not node.isNil):
-        let dif = cmp(key, node.key);
+        let dif = cmp(akey, node.key);
         if (dif < 0):
             node = node.left
         elif (dif > 0):
@@ -548,20 +548,20 @@ func map*[K,V,T](root: BBTree[K,V], f: func (key: K, val: V): T): BBTree[K,T] =
 
 # This is Adams's concat3
 #
-func join[K,V](key: K, val: V, left, right: BBTree[K,V]): BBTree[K,V] =
-    if left.isNil:
-        result = add(right, key, val)
-    elif right.isNil:
-        result = add(left, key, val)
+func join[K,V](akey: K, aval: V, aleft, aright: BBTree[K,V]): BBTree[K,V] =
+    if aleft.isNil:
+        result = add(aright, akey, aval)
+    elif aright.isNil:
+        result = add(aleft, akey, aval)
     else:
-        let sl = nodeSize(left)
-        let sr = nodeSize(right)
+        let sl = nodeSize(aleft)
+        let sr = nodeSize(aright)
         if (omega * sl) < sr:
-            result = balance(join(key, val, left, right.left), right.key, right.val, right.right)
+            result = balance(join(akey, aval, aleft, aright.left), aright.key, aright.val, aright.right)
         elif (omega * sr) < sl:
-            result = balance(left.left, left.key, left.val, join(key, val, left.right, right))
+            result = balance(aleft.left, aleft.key, aleft.val, join(akey, aval, aleft.right, aright))
         else:
-            result = newNode(left, key, val, right)
+            result = newNode(aleft, akey, aval, aright)
 
 # This is Adams's concat
 #
@@ -576,18 +576,18 @@ func join[K,V](left, right: BBTree[K,V]): BBTree[K,V] =
 
 # This is Adams's split_lt and split_gt combined into one function, along with contains(root, key)
 #
-func split[K,V](key: K, root: BBTree[K,V]): (BBTree[K,V], bool, BBTree[K,V]) =
+func split[K,V](akey: K, root: BBTree[K,V]): (BBTree[K,V], bool, BBTree[K,V]) =
     if root.isNil:
         result = (root, false, root)
     else:
-        let dif = cmp(key, root.key)
+        let dif = cmp(akey, root.key)
         if dif < 0:
-            let (l, b, r) = split(key, root.left)
+            let (l, b, r) = split(akey, root.left)
             result = (l, b, join(root.key, root.val, r, root.right))
         elif dif > 0:
-            let (l, b, r) = split(key, root.right)
+            let (l, b, r) = split(akey, root.right)
             result = (join(root.key, root.val, root.left, l), b, r)
-        else: # key and node.key are eq
+        else: # akey and node.key are eq
             result = (root.left, true, root.right)
 
 func splitMerge[K,V](key: K, val: V, root: BBTree[K,V], merge: func (k: K, v1, v2: V): V): 
@@ -664,13 +664,13 @@ func symmetricDifference*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
         else:
             result = join(tree2.key, tree2.val, symmetricDifference(l, tree2.left), symmetricDifference(r, tree2.right))
 
-func contains*[K,V](root: BBTree[K,V], key: K): bool =
+func contains*[K,V](root: BBTree[K,V], akey: K): bool =
     ## Returns `true` if the `key` is in the tree `root`
     ## otherwise `false`. O(log N)
     result = false
     var node = root
     while (not node.isNil):
-        let dif = cmp(key, node.key)
+        let dif = cmp(akey, node.key)
         if dif < 0:
             node = node.left
         elif dif > 0:
