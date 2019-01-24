@@ -46,76 +46,58 @@ const                           # balance criteria
     omega = 3
     alpha = 2
 
-#[
 type
-    BBTree*[K,V] = ref object of RootObj # BBTree is a generic type with keys and values of types K, V
+    NodeKind = enum
+        nkLeaf,
+        nkNode
+    BBTree*[K,V] = ref object # BBTree is a generic type with keys and values of types K, V
         ## `BBTree` is an opaque immutable type.
-
-    BBLeaf[K,V] = ref object of BBTree
-        key:   K                # the search key; must support the generic ``cmp`` proc
-        val:   V                # the data value associated with the key, and stored in a node
-
-    BBNodeL[K,V] = ref object of BBLeaf
-        left:  BBTree[K,V]      # left subtree; may be nil
-
-    BBNodeR[K,V] = ref object of BBLeaf
-        right: BBTree[K,V]      # right subtree; may be nil
-
-    BBNode2[K,V] = ref object of BBLeaf
-        left:  BBTree[K,V]      # left subtree; may be nil
-        right: BBTree[K,V]      # right subtree; may be nil
-        size:  int              # the size of the (sub-)tree rooted in this node
-
-
-
-func size[K,V](n: BBLeaf[K,V]):  int = return 1
-#func size[K,V](n: BBNodeL[K,V]): int = return 2
-#func size[K,V](n: BBNodeR[K,V]): int = return 2
-
-func left[K,V](n: BBLeaf[K,V]):  BBTree[K,V] = return nil
-#func left[K,V](n: BBNodeR[K,V]): BBTree[K,V] = return nil
-
-func right[K,V](n: BBLeaf[K,V]):  BBTree[K,V] = return nil
-#func right[K,V](n: BBNodeL[K,V]): BBTree[K,V] = return nil
-]#
-
-type
-    BBTree*[K,V] = ref object of RootObj # BBTree is a generic type with keys and values of types K, V
-        ## `BBTree` is an opaque immutable type.
-    BBLeaf[K,V] = ref object of BBTree[K,V]
-        vkey:   K               # the search key; must support the generic ``cmp`` proc
-        vval:   V               # the data value associated with the key, and stored in a node
-    BBNode[K,V] = ref object of BBTree[K,V]
-        vkey:   K               # the search key; must support the generic ``cmp`` proc
-        vval:   V               # the data value associated with the key, and stored in a node
-        vleft:  BBTree[K,V]     # left subtree; may be nil
-        vright: BBTree[K,V]     # right subtree; may be nil
-        vsize:  int             # the size of the (sub-)tree rooted in this node
-
-method key[K,V](n: BBTree[K,V]): K {.base.} = discard
-method val[K,V](n: BBTree[K,V]): V {.base.} = discard
-method size[K,V](n: BBTree[K,V]): int {.base.} = discard
-method left[K,V](n: BBTree[K,V]): BBTree[K,V] {.base.} = discard
-method right[K,V](n: BBTree[K,V]): BBTree[K,V] {.base.} = discard
-
-method key[K,V](n: BBLeaf[K,V]): K = n.vkey
-method val[K,V](n: BBLeaf[K,V]): V = n.vval
-method size[K,V](n: BBLeaf[K,V]): int = return 1
-method left[K,V](n: BBLeaf[K,V]): BBTree[K,V] = discard
-method right[K,V](n: BBLeaf[K,V]): BBTree[K,V] = discard
-
-method key[K,V](n: BBNode[K,V]): K = n.vkey
-method val[K,V](n: BBNode[K,V]): V = n.vval
-method size[K,V](n: BBNode[K,V]):  int = return n.vsize
-method left[K,V](n: BBNode[K,V]):  BBTree[K,V] = return n.vleft
-method right[K,V](n: BBNode[K,V]):  BBTree[K,V] = return n.vright
-
+        case kind: NodeKind
+        of nkLeaf:
+            lkey:   K            # the search key; must support the generic ``cmp`` proc
+            lval:   V            # the data value associated with the key, and stored in a node
+        of nkNode:
+            nkey:   K            # the search key; must support the generic ``cmp`` proc
+            nval:   V            # the data value associated with the key, and stored in a node
+            vleft:  BBTree[K,V]  # left subtree; may be nil
+            vright: BBTree[K,V]  # right subtree; may be nil
+            vsize:  int          # the size of the (sub-)tree rooted in this node
 
 func nodeSize[K,V](n: BBTree[K,V]): int {.inline.} =
     if n.isNil:
         result = 0
+    elif n.kind == nkLeaf:
+        result = 1
     else:
-        result = n.size
+        result = n.vsize
+
+func key[K,V](n: BBTree[K,V]): K {.inline.} = 
+    if n.kind == nkLeaf:
+        result = n.lkey
+    else:
+        result = n.nkey
+
+func val[K,V](n: BBTree[K,V]): V {.inline.} = 
+    if n.kind == nkLeaf:
+        result = n.lval
+    else:
+        result = n.nval
+
+func left[K,V](n: BBTree[K,V]): BBTree[K,V] {.inline.} = 
+    if n.isNil:
+        result = nil
+    elif n.kind == nkLeaf:
+        result = nil
+    else:
+        result = n.vleft
+
+func right[K,V](n: BBTree[K,V]): BBTree[K,V] {.inline.} = 
+    if n.isNil:
+        result = nil
+    elif n.kind == nkLeaf:
+        result = nil
+    else:
+        result = n.vright
 
 func len*[K,V](root: BBTree[K,V]): int =
     ## Returns the number of keys in tree at `root`.  O(1)
@@ -123,15 +105,15 @@ func len*[K,V](root: BBTree[K,V]): int =
 
 func newLeaf[K,V](key: K, value: V): BBTree[K,V] =
     # constructor for a leaf node
-    result = cast[BBTree[K,V]](BBLeaf[K,V](vkey: key, vval: value))
+    result = BBTree[K,V](kind: nkLeaf, lkey: key, lval: value)
 
 func newNode[K,V](left: BBTree[K,V], key: K, value: V, right: BBTree[K,V]): BBTree[K,V] =
     # constructor for a new node
     if left.isNil and right.isNil:
-        result = cast[BBTree[K,V]](BBLeaf[K,V](vkey: key, vval: value))
+        result = BBTree[K,V](kind: nkLeaf, lkey: key, lval: value)
     else:
         let size = nodeSize(left) + 1 + nodeSize(right)
-        result = cast[BBTree[K,V]](BBNode[K,V](vleft: left, vright: right, vsize: size, vkey: key, vval: value))
+        result = BBTree[K,V](kind: nkNode, vleft: left, vright: right, vsize: size, nkey: key, nval: value)
 
 #[ **************************** balance ********************************
 #
