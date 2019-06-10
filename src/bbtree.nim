@@ -471,7 +471,7 @@ func fold*[K,V,T](root: BBTree[K,V], f: proc (key: K, val: V, base: T): T, base:
         result = f(curr.key, curr.val, result)
         curr = curr.left # now go left
 
-func map*[K,V,T](root: BBTree[K,V], f: func (key: K, val: V): T): BBTree[K,T] =
+func map*[K,V,T](root: BBTree[K,V], f: proc (key: K, val: V): T {.noSideEffect.}): BBTree[K,T] =
     ## Returns a new tree with the keys of tree `root` and values that are the result of 
     ## applying `f` to each key and corresponding value. So, for example, to construct a
     ## tree with values replaced by concatenated string of key,value pairs, you could use
@@ -531,7 +531,7 @@ func split[K,V](key: K, root: BBTree[K,V]): (BBTree[K,V], bool, BBTree[K,V]) =
         else: # key and node.key are eq
             result = (root.left, true, root.right)
 
-func splitMerge[K,V](key: K, val: V, root: BBTree[K,V], merge: func (k: K, v1, v2: V): V): 
+func splitMerge[K,V](key: K, val: V, root: BBTree[K,V], merge: proc (k: K, v1, v2: V): V {.noSideEffect.}): 
     (BBTree[K,V], bool, V, BBTree[K,V]) =
     if root.isNil:
         result = (root, false, val, root)
@@ -563,7 +563,7 @@ func union*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
         discard b
         result = join(tree1.key, tree1.val, union(tree1.left, l), union(tree1.right, r))
 
-func unionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v2: V): V): BBTree[K,V] =
+func unionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: proc (k: K, v1, v2: V): V {.noSideEffect.}): BBTree[K,V] =
     ## Returns the union of the sets represented by the keys in `tree1` and `tree2`.
     ## When viewed as maps, returns the key,value pairs that appear in either tree; if
     ## a key appears in both trees, the value for that key is the result of the supplied
@@ -638,7 +638,7 @@ func intersection*[K,V](tree1, tree2: BBTree[K,V]): BBTree[K,V] =
         else:
             result = join(intersection(tree1.left, l), intersection(tree1.right, r))
 
-func intersectionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: func (k: K, v1, v2: V): V): BBTree[K,V] =
+func intersectionMerge*[K,V](tree1, tree2: BBTree[K,V], merge: proc (k: K, v1, v2: V): V {.noSideEffect.}): BBTree[K,V] =
     ## Returns the set intersection of `tree1` and `tree2`. In other words, returns the keys
     ## that are in both trees. 
     ## When viewed as maps, returns the key,value pairs for keys that appear in both trees; 
